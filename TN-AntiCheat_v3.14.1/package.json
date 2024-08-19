@@ -1,0 +1,33 @@
+{
+  "name": "tn-anticheat",
+  "version": "3.14.1",
+  "description": "Anti-cheat addon with ScriptAPI / For Multiplayer, Realms, Servers / Recommended Japanese",
+  "main": "scripts/index.js",
+  "typings": "scripts/types.d.ts",
+  "scripts": {
+    "lint": "eslint ./scripts --ext .js & tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tutinoko2048/TNAntiCheat.git"
+  },
+  "author": "tutinoko2048",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/tutinoko2048/TNAntiCheat/issues"
+  },
+  "homepage": "https://github.com/tutinoko2048/TNAntiCheat/blob/main/README.md",
+  "devDependencies": {
+    "@actions/core": "^1.10.1",
+    "@actions/github": "^6.0.0",
+    "@minecraft/server": "1.12.0-beta.1.21.0-stable",
+    "@minecraft/server-ui": "1.2.0-beta.1.21.0-stable",
+    "eslint": "^8.56.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-jsdoc": "^46.8.2",
+    "typescript": "^5.3.3"
+  },
+  "overrides": {
+    "@minecraft/server": "$@minecraft/server"
+  }
+}

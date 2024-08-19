@@ -1,0 +1,16 @@
+{
+    "format_version": "1.20.20",
+    "minecraft:item": {
+        "description": {
+            "identifier": "karo:login_ticket"
+        },
+        "components": {
+            "minecraft:icon": {
+                "texture": "paper"
+            },
+            "minecraft:glint": {
+                "value": true
+            }
+        }
+    }
+}

@@ -1,0 +1,49 @@
+{
+    "format_version": 2,
+    "header": {
+        "description": "かろEARTH用アドオン",
+        "name": "KaroEarth",
+        "uuid": "f279f83f-a5cf-4cf1-88c5-bf7ad450b46f",
+        "version": [
+            2,
+            0,
+            1
+        ],
+        "min_engine_version": [
+            1,
+            19,
+            40
+        ]
+    },
+    "modules": [
+        {
+            "description": "",
+            "type": "script",
+            "entry": "scripts/main.js",
+            "uuid": "b48832d3-7a8c-4f60-9154-ecc06cbbfc2f",
+            "version": [
+                2,
+                0,
+                1
+            ]
+        }
+    ],
+    "dependencies": [
+        {
+            "module_name": "@minecraft/server",
+            "version": "2.0.0-alpha"
+        },
+        {
+            "module_name": "@minecraft/server-net",
+            "version": "1.0.0-beta"
+        },
+        {
+            "module_name": "@minecraft/server-gametest",
+            "version": "2.0.0-alpha"
+        },
+        {
+            "module_name": "@minecraft/server-ui",
+            "version": "2.0.0-alpha"
+        }
+    ]
+}
