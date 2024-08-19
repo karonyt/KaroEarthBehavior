@@ -246,7 +246,7 @@ export const itemIdToPath = {
   "minecraft:raw_iron_block": "textures/blocks/raw_iron_block",
   "minecraft:raw_copper_block": "textures/blocks/raw_copper_block",
   "minecraft:raw_gold_block": "textures/blocks/raw_gold_block",
-  "minecraft:glowstone": "textures/items/glowstone_dust",
+  "minecraft:glowstone": "textures/blocks/glowstone",
   "minecraft:budding_amethyst": "textures/blocks/budding_amethyst",
   "minecraft:small_amethyst_bud": "textures/blocks/small_amethyst_bud",
   "minecraft:medium_amethyst_bud": "textures/blocks/medium_amethyst_bud",
