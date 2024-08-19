@@ -2,7 +2,7 @@ import { world, Player, system } from "@minecraft/server";
 import { ModalFormData, FormCancelationReason } from "@minecraft/server-ui"
 
 const unbanList = [];
-const banList = [`giyokundaK`,`bedrock6gatu`,`D Berlin98`,`reizylake`,`Harukixx1008`];
+const banList = [`giyokundaK`, `bedrock6gatu`, `D Berlin98`, `reizylake`, `Harukixx1008`];
 const unmuteList = [];
 const muteList = [];
 
@@ -65,7 +65,7 @@ function banForm(player) {
             target.setDynamicProperty(`isBan`, true);
             target.runCommand(`kick "${target.name}" §c§lあなたはBANされています\nReason: ${rs.formValues[1]}`);
             player.sendMessage(`§a${target.name}をBANしました`)
-            world.sendMessage(`§a[KaronNetWork BAN System]§r\n${target.name} §r§7の接続を拒否しました`);        
+            world.sendMessage(`§a[KaronNetWork BAN System]§r\n${target.name} §r§7の接続を拒否しました`);
         } catch (error) {
         };
     });
@@ -133,7 +133,7 @@ function unmuteForm(player) {
 
 world.afterEvents.worldInitialize.subscribe(() => {
     const players = world.getPlayers();
-    for(const player of players) {
+    for (const player of players) {
         if (unbanList.includes(`${player.name}`) && player.getDynamicProperty(`isBan`)) {
             player.setDynamicProperty(`isBan`);
             player.sendMessage(`§a§lあなたのBANが解除されました`);
@@ -166,9 +166,9 @@ world.afterEvents.worldInitialize.subscribe(() => {
 
 world.beforeEvents.chatSend.subscribe((ev) => {
     const { sender, message } = ev;
-    if(message.startsWith(`?`)) return;
-    if(sender.hasTag(`moderator`)) {
-        if(!message.startsWith(`!`)) return;
+    if (message.startsWith(`?`)) return;
+    if (sender.hasTag(`moderator`)) {
+        if (!message.startsWith(`!`)) return;
         ev.cancel = true;
         system.run(() => {
             switch (message) {
@@ -191,11 +191,11 @@ world.beforeEvents.chatSend.subscribe((ev) => {
                 default: {
                     sender.sendMessage(`§c存在しないコマンド`);
                 };
-            };    
+            };
             return;
         });
     };
-    if(sender.getDynamicProperty(`isMute`)) {
+    if (sender.getDynamicProperty(`isMute`)) {
         ev.cancel = true;
         system.run(() => {
             sender.sendMessage(`§cあなたはMUTEされています`);
