@@ -17,3 +17,5 @@ import "./lib/item";
 import "./lib/server_net";
 
 import "./anticheat";
+
+import "./custom_component";
