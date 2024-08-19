@@ -68,31 +68,6 @@
         "components": {
           "minecraft:material_instances": {
             "*": {
-              "texture": "wheat_stage_1",
-              "render_method": "blend",
-              "face_dimming": false,
-              "ambient_occlusion": false
-            }
-          },
-          "minecraft:selection_box": {
-            "origin": [
-              -8,
-              0,
-              -8
-            ],
-            "size": [
-              16,
-              5,
-              16
-            ]
-          }
-        }
-      },
-      {
-        "condition": "q.block_state('mc:growth_stage') == 2",
-        "components": {
-          "minecraft:material_instances": {
-            "*": {
               "texture": "wheat_stage_2",
               "render_method": "blend",
               "face_dimming": false,
@@ -107,18 +82,18 @@
             ],
             "size": [
               16,
-              9,
+              10,
               16
             ]
           }
         }
       },
       {
-        "condition": "q.block_state('mc:growth_stage') == 3",
+        "condition": "q.block_state('mc:growth_stage') == 2",
         "components": {
           "minecraft:material_instances": {
             "*": {
-              "texture": "wheat_stage_3",
+              "texture": "wheat_stage_4",
               "render_method": "blend",
               "face_dimming": false,
               "ambient_occlusion": false
@@ -135,8 +110,33 @@
               13,
               16
             ]
+          }
+        }
+      },
+      {
+        "condition": "q.block_state('mc:growth_stage') == 3",
+        "components": {
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "wheat_stage_6",
+              "render_method": "blend",
+              "face_dimming": false,
+              "ambient_occlusion": false
+            }
           },
-          "minecraft:loot": "loot_tables/empty.json"
+          "minecraft:selection_box": {
+            "origin": [
+              -8,
+              0,
+              -8
+            ],
+            "size": [
+              16,
+              15,
+              16
+            ]
+          },
+          "minecraft:loot": "loot_tables/blocks/rice_plant.json"
         }
       }
     ]

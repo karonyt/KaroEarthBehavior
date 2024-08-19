@@ -7,12 +7,6 @@
                     "type": "item",
                     "name": "mc:rice_seed",
                     "quantity": 1,
-                    "functions": [
-                        {
-                            "function": "looting_enchant",
-                            "count": 1
-                        }
-                    ],
                     "weight": 1
                 }
             ]

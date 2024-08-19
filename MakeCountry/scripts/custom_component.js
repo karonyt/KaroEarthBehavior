@@ -7,7 +7,7 @@ world.beforeEvents.worldInitialize.subscribe((ev) => {
         onRandomTick(ev) {
             const growth_stage = ev.block.permutation.getState('mc:growth_stage');
             if (growth_stage < 3) {
-                const randomNum = RandomInt(1, 20);
+                const randomNum = RandomInt(1, 25);
                 if (randomNum != 2) return; 
                 const new_permutation = ev.block.permutation.withState('mc:growth_stage', growth_stage + 1);
                 ev.block.setPermutation(new_permutation);
