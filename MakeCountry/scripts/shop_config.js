@@ -85,4 +85,8 @@ export default [
     {id: `minecraft:ancient_debris`,price: 10000},
     {id: `minecraft:shulker_shell`,price: 600},
     {id: `minecraft:sponge`,price: 100},
+    {id: `minecraft:glowstone`,price: 40},
+    {id: `mc:rice_seed`,price: 5},
+    {id: `mc:purpur_block`,price: 10},
+    {id: `mc:end_stone`,price: 10},
 ];

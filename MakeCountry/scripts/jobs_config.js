@@ -65,7 +65,7 @@ export default {
     cocoaHarvestReward: { min: 5, max: 25 }, //ココア収穫時にもらえるお金の変域
 
     oreMiningReward: { min: 5, max: 20 }, //鉱石系ブロックを掘ったときにもらえるお金の変域
-    stoneMiningReward: { min: 1, max: 10 }, //石系ブロックを掘ったときにもらえるお金の変域
+    stoneMiningReward: { min: 1, max: 5 }, //石系ブロックを掘ったときにもらえるお金の変域
 
     skeletonKillReward: { min: 10, max: 25 }, //スケルトンを倒したときにもらえるお金の変域
     strayKillReward: { min: 10, max: 25 }, //ストレイを倒したときにもらえるお金の変域
@@ -109,8 +109,8 @@ export default {
     batKillReward: { min: 1, max: 20 }, //コウモリを倒したときにもらえるお金の変域
     axolotlKillReward: { min: 1, max: 30 }, //ウーパールーパーを倒したときにもらえるお金の変域
     camelKillReward: { min: 1, max: 35 }, //ラクダを倒したときにもらえるお金の変域
-    catKillReward: { min: 1, max: 35 }, //猫を倒したときにもらえるお金の変域
-    ocelotKillReward: { min: 1, max: 30 }, //ヤマネコを倒したときにもらえるお金の変域
+    catKillReward: { min: 1, max: 1 }, //猫を倒したときにもらえるお金の変域
+    ocelotKillReward: { min: 1, max: 1 }, //ヤマネコを倒したときにもらえるお金の変域
     pandaKillReward: { min: 1, max: 30 }, //パンダを倒したときにもらえるお金の変域
     parrotKillReward: { min: 1, max: 20 }, //オウムを倒したときにもらえるお金の変域
     snifferKillReward: { min: 1, max: 40 }, //スニッファーを倒したときにもらえるお金の変域
@@ -162,5 +162,5 @@ export default {
     tnt_minecartKillReward: { min: 0, max: 0 }, //TNT付きトロッコをこわしたときにもらえるお金の変域
     armor_standKillReward: { min: 0, max: 0 }, //防具立てをこわしたときにもらえるお金の変域
 
-    otherMobkillReward: { min: 1, max: 10 }, //その他のエンティティを倒したときにもらえるお金の変域
+    otherMobkillReward: { min: 0, max: 0 }, //その他のエンティティを倒したときにもらえるお金の変域
 };

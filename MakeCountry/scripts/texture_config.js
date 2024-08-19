@@ -919,4 +919,5 @@ export const itemIdToPath = {
   "karo:gatya_ticket": "textures/items/paper",
   "karo:gatya_ticket2": "textures/items/paper",
   "karo:gatya_ticket3": "textures/items/paper",
+  "mc:rice_seed": "textures/items/seeds_beetroot",
 }
