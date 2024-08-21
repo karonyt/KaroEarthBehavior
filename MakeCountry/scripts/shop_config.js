@@ -101,5 +101,4 @@ export default [
     {id: `minecraft:crimson_fungus`,price: 4},
     {id: `minecraft:warped_stem`,price: 6},
     {id: `minecraft:warped_fungus`,price: 4},
-    {id: `minecraft:crimson_stem`,price: 4},
 ];
