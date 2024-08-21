@@ -280,7 +280,7 @@ export const itemIdToPath = {
   "minecraft:brown_mushroom": "textures/blocks/mushroom_block_skin_brown",
   "minecraft:red_mushroom": "textures/blocks/mushroom_block_skin_red",
   "minecraft:crimson_fungus": "textures/blocks/crimson_fungus",
-  "minecraft:warped_fungus": "textures/items/warped_fungus_on_a_stick",
+  "minecraft:warped_fungus": "textures/blocks/warped_fungus",
   "minecraft:deadbush": "textures/blocks/deadbush",
   "minecraft:yellow_flower": "textures/blocks/flower_dandelion",
   "minecraft:red_flower": "textures/blocks/flower_tulip_red",
