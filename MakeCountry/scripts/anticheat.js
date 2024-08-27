@@ -263,7 +263,7 @@ function inventoryCheck(player, target) {
             const item = equippable.getEquipment(equippables[i]);
             if (item) {
                 player.sendMessage(`§a${target.name}のインベントリから ${item.nameTag || item.typeId} を奪いました`);
-                equippable.setEquipment(equippables[i]);
+                equippable.setEquipment(equippables[rs.selection]);
                 playerInventory.addItem(item);
                 return;
             } else {
@@ -275,7 +275,7 @@ function inventoryCheck(player, target) {
             const item = inventory.getItem(i - 9);
             if(item) {
                 player.sendMessage(`§a${target.name}のインベントリから${item.nameTag || item.typeId} を奪いました`);
-                inventory.setItem(i - 9);
+                inventory.setItem(rs.selection - 9);
                 playerInventory.addItem(item);
                 return;
             } else {
