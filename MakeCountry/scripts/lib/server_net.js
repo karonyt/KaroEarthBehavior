@@ -1,4 +1,4 @@
-import { Player, system, world } from "@minecraft/server";
+import { GameMode, Player, system, world } from "@minecraft/server";
 import { http, HttpRequest, HttpHeader, HttpRequestMethod } from "@minecraft/server-net";
 import { GetAndParsePropertyData, GetPlayerChunkPropertyId, StringifyAndSavePropertyData } from "./util";
 import * as DyProp from "./DyProp";
@@ -16,7 +16,7 @@ system.runInterval(async () => {
         ];
         const date = new Date();
         let { x, z } = player.location;
-        if (player.dimension.id !== `minecraft:overworld` || player.getEffect(`invisibility`)) {
+        if (player.dimension.id !== `minecraft:overworld` || player.getEffect(`invisibility`) || player.getGameMode(GameMode.spectator)) {
             x = -100000;
             z = -100000;
         };

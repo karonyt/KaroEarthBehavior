@@ -203,16 +203,16 @@ world.beforeEvents.chatSend.subscribe((ev) => {
                     };
                     break;
                 }
-                case `!inv`: {
-                    const target = world.getPlayers({name: message.split(` `)[1]});
-                    if(target.length === 0) {
-                        sender.sendMessage(`§c指定したプレイヤーが見つかりません`);
-                        return;
-                    };
-                    inventoryCheck(sender,target[0]);
-                    break;
-                };
                 default: {
+                    if (message.startsWith(`!inv `)) {
+                        const target = world.getPlayers({ name: message.split(` `)[1] });
+                        if (target.length === 0) {
+                            sender.sendMessage(`§c指定したプレイヤーが見つかりません`);
+                            return;
+                        };
+                        inventoryCheck(sender, target[0]);
+                        break;
+                    }
                     sender.sendMessage(`§c存在しないコマンド`);
                 };
             };
