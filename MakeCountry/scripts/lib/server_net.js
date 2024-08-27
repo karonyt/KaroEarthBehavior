@@ -16,7 +16,7 @@ system.runInterval(async () => {
         ];
         const date = new Date();
         let { x, z } = player.location;
-        if (player.dimension.id !== `minecraft:overworld` || player.getEffect(`invisibility`) || player.getGameMode(GameMode.spectator)) {
+        if (player.dimension.id !== `minecraft:overworld` || player.getEffect(`invisibility`) || player.getGameMode() == GameMode.spectator) {
             x = -100000;
             z = -100000;
         };
