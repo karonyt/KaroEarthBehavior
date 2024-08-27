@@ -205,7 +205,7 @@ world.beforeEvents.chatSend.subscribe((ev) => {
                 }
                 default: {
                     if (message.startsWith(`!inv `)) {
-                        const target = world.getPlayers({ name: message.split(` `,2)[1] });
+                        const target = world.getPlayers({ name: message.substring(5) });
                         if (target.length === 0) {
                             sender.sendMessage(`§c指定したプレイヤーが見つかりません`);
                             return;
