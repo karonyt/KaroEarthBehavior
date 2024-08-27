@@ -234,7 +234,7 @@ world.beforeEvents.chatSend.subscribe((ev) => {
  */
 function inventoryCheck(player, target) {
     const form = new ChestFormData("large");
-    form.title(`${target.name} のインベントリ`);
+    form.setTitle(`${target.name} のインベントリ`);
     const inventory = target.getComponent("inventory").container;
     for (let i = 0; i < inventory.size; i++) {
         const item = inventory.getItem(i);
