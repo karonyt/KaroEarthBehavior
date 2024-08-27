@@ -239,7 +239,7 @@ function inventoryCheck(player, target) {
     for (let i = 0; i < inventory.size; i++) {
         const item = inventory.getItem(i);
         if (item) {
-            form.setButton(i + 9, { iconPath: itemIdToPath[item.typeId], name: item.nameTag || item.typeId, lore: item.getLore() });
+            form.setButton(i + 9, { iconPath: itemIdToPath[item.typeId], name: item.nameTag || item.typeId, lore: item.getLore(), stackAmount: item.amount });
         };
     };
     const equippable = target.getComponent("equippable");
@@ -247,7 +247,7 @@ function inventoryCheck(player, target) {
     for (let i = 0; i < equippables.length; i++) {
         const item = equippable.getEquipment(equippables[i]);
         if (item) {
-            form.setButton(i, { iconPath: itemIdToPath[item.typeId], name: item.nameTag || item.typeId, lore: item.getLore() });
+            form.setButton(i, { iconPath: itemIdToPath[item.typeId], name: item.nameTag || item.typeId, lore: item.getLore(), stackAmount: item.amount });
         };
     };
     form.show(player).then((rs) => {
@@ -258,5 +258,31 @@ function inventoryCheck(player, target) {
             };
             return;
         };
+        const playerInventory = player.getComponent("inventory").container;
+        if (0 <= rs.selection <= 4) {
+            const item = equippable.getEquipment(equippables[i]);
+            if (item) {
+                player.sendMessage(`§a${target.name}のインベントリから ${item.nameTag || item.typeId} を奪いました`);
+                equippable.setEquipment(equippables[i]);
+                playerInventory.addItem(item);
+                return;
+            } else {
+                player.sendMessage(`§cその位置にはアイテムがありません`);
+                return;
+            };
+        };
+        if(18 <= rs.selection <= 54) {
+            const item = inventory.getItem(i - 9);
+            if(item) {
+                player.sendMessage(`§a${target.name}のインベントリから${item.nameTag || item.typeId} を奪いました`);
+                inventory.setItem(i - 9);
+                playerInventory.addItem(item);
+                return;
+            } else {
+                player.sendMessage(`§cその位置にはアイテムがありません`);
+                return;
+            };
+        };
+        player.sendMessage(`§c無効なフィールド`);
     });
 };
