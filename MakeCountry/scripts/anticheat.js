@@ -1,5 +1,7 @@
-import { world, Player, system } from "@minecraft/server";
+import { world, Player, system, GameMode, EquipmentSlot } from "@minecraft/server";
 import { ModalFormData, FormCancelationReason } from "@minecraft/server-ui"
+import { ChestFormData } from "./lib/chest-ui";
+import { itemIdToPath } from "./texture_config";
 
 const unbanList = [];
 const banList = [`giyokundaK`, `bedrock6gatu`, `D Berlin98`, `reizylake`, `Harukixx1008`];
@@ -185,9 +187,31 @@ world.beforeEvents.chatSend.subscribe((ev) => {
                     break;
                 };
                 case `!help`: {
-                    sender.sendMessage(`§a!ban§f: BANフォームを開く\n§a!mute§f: MUTEフォームを開く\n§a!unmute§f: UNMUTEフォームを開く\n`);
+                    sender.sendMessage(`§a!ban§f: BANフォームを開く\n§a!mute§f: MUTEフォームを開く\n§a!unmute§f: UNMUTEフォームを開く\n§a!sp§f: ゲームモードを切り替える`);
                     break;
                 }
+                case `!sp`: {
+                    switch (sender.getGameMode()) {
+                        case GameMode.spectator: {
+                            sender.setGameMode(GameMode.survival);
+                            break;
+                        };
+                        case GameMode.survival: {
+                            sender.setGameMode(GameMode.spectator);
+                            break;
+                        };
+                    };
+                    break;
+                }
+                case `!inv`: {
+                    const target = world.getPlayers({name: message.split(` `)[1]});
+                    if(target.length === 0) {
+                        sender.sendMessage(`§c指定したプレイヤーが見つかりません`);
+                        return;
+                    };
+                    inventoryCheck(sender,target[0]);
+                    break;
+                };
                 default: {
                     sender.sendMessage(`§c存在しないコマンド`);
                 };
@@ -202,3 +226,37 @@ world.beforeEvents.chatSend.subscribe((ev) => {
         });
     };
 });
+
+/**
+ * 
+ * @param {Player} player 
+ * @param {Player} target 
+ */
+function inventoryCheck(player, target) {
+    const form = new ChestFormData("large");
+    form.title(`${target.name} のインベントリ`);
+    const inventory = target.getComponent("inventory").container;
+    for (let i = 0; i < inventory.size; i++) {
+        const item = inventory.getItem(i);
+        if (item) {
+            form.setButton(i + 9, { iconPath: itemIdToPath[item.typeId], name: item.nameTag || item.typeId, lore: item.getLore() });
+        };
+    };
+    const equippable = target.getComponent("equippable");
+    const equippables = [EquipmentSlot.Head, EquipmentSlot.Body, EquipmentSlot.Legs, EquipmentSlot.Feet, EquipmentSlot.Offhand];
+    for (let i = 0; i < equippables.length; i++) {
+        const item = equippable.getEquipment(equippables[i]);
+        if (item) {
+            form.setButton(i, { iconPath: itemIdToPath[item.typeId], name: item.nameTag || item.typeId, lore: item.getLore() });
+        };
+    };
+    form.show(player).then((rs) => {
+        if (rs.canceled) {
+            if (rs.cancelationReason === FormCancelationReason.UserBusy) {
+                inventoryCheck(player, target);
+                return;
+            };
+            return;
+        };
+    })
+};
