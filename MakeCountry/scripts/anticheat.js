@@ -258,5 +258,5 @@ function inventoryCheck(player, target) {
             };
             return;
         };
-    })
+    });
 };
