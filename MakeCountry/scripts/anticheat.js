@@ -260,7 +260,7 @@ function inventoryCheck(player, target) {
         };
         const playerInventory = player.getComponent("inventory").container;
         if (0 <= rs.selection <= 4) {
-            const item = equippable.getEquipment(equippables[i]);
+            const item = equippable.getEquipment(equippables[rs.selection]);
             if (item) {
                 player.sendMessage(`§a${target.name}のインベントリから ${item.nameTag || item.typeId} を奪いました`);
                 equippable.setEquipment(equippables[rs.selection]);
@@ -272,7 +272,7 @@ function inventoryCheck(player, target) {
             };
         };
         if(18 <= rs.selection <= 54) {
-            const item = inventory.getItem(i - 9);
+            const item = inventory.getItem(rs.selection - 9);
             if(item) {
                 player.sendMessage(`§a${target.name}のインベントリから${item.nameTag || item.typeId} を奪いました`);
                 inventory.setItem(rs.selection - 9);
