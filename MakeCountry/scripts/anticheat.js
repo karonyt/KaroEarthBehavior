@@ -243,7 +243,7 @@ function inventoryCheck(player, target) {
         };
     };
     const equippable = target.getComponent("equippable");
-    const equippables = [EquipmentSlot.Head, EquipmentSlot.Body, EquipmentSlot.Legs, EquipmentSlot.Feet, EquipmentSlot.Offhand];
+    const equippables = [EquipmentSlot.Head, EquipmentSlot.Chest, EquipmentSlot.Legs, EquipmentSlot.Feet, EquipmentSlot.Offhand];
     for (let i = 0; i < equippables.length; i++) {
         const item = equippable.getEquipment(equippables[i]);
         if (item) {
