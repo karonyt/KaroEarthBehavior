@@ -33,7 +33,7 @@ system.runInterval(() => {
 system.runInterval(() => {
     if (!world.getDynamicProperty(`start`)) return;
     const zikan = new Date();
-    if (zikan.getHours() == 21 && zikan.getMinutes() == 50) {
+    if (zikan.getHours() == 20 && zikan.getMinutes() == 50) {
         world.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n§r税回収&維持費徴収まで残り10分です\n建国から3日が経過した国は維持費が徴収されます\n平和主義は50$/1チャンク\n非平和主義国は5$/1チャンク\n維持費は国庫の国家予算から引かれるため予め入金しておいてください` }] });
     }
     if (zikan.getHours() == 0 && zikan.getMinutes() == 0) {
