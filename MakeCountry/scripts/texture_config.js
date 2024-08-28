@@ -505,7 +505,7 @@ export const itemIdToPath = {
   "minecraft:ender_pearl": "textures/items/ender_pearl",
   "minecraft:elytra": "textures/items/elytra",
   "minecraft:mace": "textures/items/mace",
-  "minecraft:firework_rocket": "textures/items/crossbow_firework",
+  "minecraft:firework_rocket": "textures/items/fireworks",
   "minecraft:saddle": "textures/items/saddle",
   "minecraft:carrot_on_a_stick": "textures/items/carrot_on_a_stick",
   "minecraft:warped_fungus_on_a_stick": "textures/items/warped_fungus_on_a_stick",
