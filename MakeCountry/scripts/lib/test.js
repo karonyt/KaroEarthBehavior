@@ -108,7 +108,7 @@ system.afterEvents.scriptEventReceive.subscribe((ev) => {
         };
         case `karo:mobtest`: {
             const [messageSplit1, ...messageSplit2] = message.split(` `, 2);
-            sourceEntity.sendMessage(`半径${messageSplit1}m以内にいる${messageSplit2}は${sourceEntity.dimension.getEntities({ location: sourceEntity.location, maxDistance: Number(messageSplit1), type: messageSplit2 }).length}`);
+            sourceEntity.sendMessage(`半径${messageSplit1}m以内にいる${messageSplit2}は${sourceEntity.dimension.getEntities({ location: sourceEntity.location, maxDistance: Number(messageSplit1), type: messageSplit2.join(``) }).length}`);
             break;
         };
         case `karo:keylistnum`: {
