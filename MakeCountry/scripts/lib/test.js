@@ -107,7 +107,15 @@ system.afterEvents.scriptEventReceive.subscribe((ev) => {
             break;
         };
         case `karo:mobtest`: {
+            if (message.length === 0) {
+                sourceEntity.sendMessage(`読み込まれているエンティティ数は${sourceEntity.dimension.getEntities().length}体です`);
+                break;
+            };
             const [messageSplit1, ...messageSplit2] = message.split(` `, 2);
+            if (messageSplit2.length === 0) {
+                sourceEntity.sendMessage(`半径${messageSplit1}m以内にいるエンティティは${sourceEntity.dimension.getEntities({ location: sourceEntity.location, maxDistance: Number(messageSplit1) }).length}体です`);
+                break;
+            };
             sourceEntity.sendMessage(`半径${messageSplit1}m以内にいる${messageSplit2}は${sourceEntity.dimension.getEntities({ location: sourceEntity.location, maxDistance: Number(messageSplit1), type: messageSplit2.join(``) }).length}`);
             break;
         };
