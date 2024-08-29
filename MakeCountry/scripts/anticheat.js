@@ -9,6 +9,14 @@ const banList = [`giyokundaK`, `bedrock6gatu`, `D Berlin98`, `reizylake`, `Haruk
 const unmuteList = [];
 const muteList = [];
 
+system.afterEvents.scriptEventReceive.subscribe((ev) => {
+    switch(ev.id) {
+        case `karo:unban`: {
+            unbanList.push(ev.message);
+        };
+    };
+});
+
 const rawDeviceIds = DyProp.getDynamicProperty("deviceIds") || "[]";
 /**
  * @type {[string]}
@@ -146,7 +154,7 @@ async function banForm(player) {
 
             if (rs.formValues[1] != "") target.setDynamicProperty(`banReason`, rs.formValues[1]);
             target.setDynamicProperty(`isBan`, true);
-            target.runCommand(`kick "${target.name}" §c§lあなたはBANされています\nReason: ${rs.formValues[1]}`);
+            target.runCommand(`kick "${playerParseDataBefore.xuid}" §c§lあなたはBANされています\nReason: ${rs.formValues[1]}`);
             player.sendMessage(`§a${target.name}をBANしました`)
             world.sendMessage(`§a[KaronNetWork BAN System]§r\n${target.name} §r§7の接続を拒否しました`);
         } catch (error) {

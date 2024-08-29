@@ -1,9 +1,10 @@
 import { GameMode, Player, system, world } from "@minecraft/server";
 import { http, HttpRequest, HttpHeader, HttpRequestMethod } from "@minecraft/server-net";
 import { GetAndParsePropertyData, GetPlayerChunkPropertyId, StringifyAndSavePropertyData } from "./util";
+import { executeCommand } from "../anticheat";
 import * as DyProp from "./DyProp";
 
-const killLogCheckEntityIds = [`minecraft:parrot`,`minecraft:ender_dragon`,`minecraft:wolf`,`minecraft:cat`,`minecraft:wither`,`minecraft:npc`,`minecraft:villager_v2`,`minecraft:zombie_villager_v2`]
+const killLogCheckEntityIds = [`minecraft:parrot`, `minecraft:ender_dragon`, `minecraft:wolf`, `minecraft:cat`, `minecraft:wither`, `minecraft:npc`, `minecraft:villager_v2`, `minecraft:zombie_villager_v2`]
 
 system.runInterval(async () => {
     const players = world.getPlayers();
@@ -20,7 +21,7 @@ system.runInterval(async () => {
             x = -100000;
             z = -100000;
         };
-        
+
         req.body = JSON.stringify({
             name: player.name,
             point: {
@@ -115,11 +116,11 @@ let chat3 = "a";
 let chatFirst = true;
 let chat2First = true;
 let chat3First = true;
-system.runInterval( async () => {
+system.runInterval(async () => {
     const res = await http.get("http://localhost:20005/");
     if (res.body !== chat) {
         chat = res.body;
-        if(chatFirst) {
+        if (chatFirst) {
             chatFirst = false;
             return;
         };
@@ -128,13 +129,13 @@ system.runInterval( async () => {
             world.sendMessage(`${parseData.honyakuMessage}`);
         };
     };
-},10);
+}, 10);
 
-system.runInterval( async () => {
+system.runInterval(async () => {
     const res = await http.get("http://localhost:20007/");
     if (res.body !== chat2) {
         chat2 = res.body;
-        if(chat2First) {
+        if (chat2First) {
             chat2First = false;
             return;
         };
@@ -143,17 +144,17 @@ system.runInterval( async () => {
             world.sendMessage(`§2 [§bDiscord-§r${parseData.authorName}§2] §r ${parseData.text}`);
         }
     };
-},10);
-system.runInterval( async () => {
+}, 10);
+system.runInterval(async () => {
     const res = await http.get("http://localhost:20004/");
     const votedata = DyProp.getDynamicProperty(`voteData`);
-    if(!votedata) return;
+    if (!votedata) return;
     if (res.body !== chat3) {
         chat3 = res.body;
-        if(chat3First) {
+        if (chat3First) {
             chat3First = false;
             return;
-        };            
+        };
         const parseData = JSON.parse(res.body);
         if (parseData.username) {
             let parseVotedata = JSON.parse(votedata);
@@ -163,17 +164,81 @@ system.runInterval( async () => {
                 username: parseData.username,
                 servername: parseData.server
             });
-        
+
             req.method = HttpRequestMethod.Post;
             req.headers = [
                 new HttpHeader("Content-Type", "application/json")
             ];
             await http.request(req);
             if (Object.keys(parseVotedata).includes(`${parseData.username}`)) return;
-            Object.assign(parseVotedata,{ [parseData.username]: false});
-            StringifyAndSavePropertyData(`voteData`,parseVotedata);
+            Object.assign(parseVotedata, { [parseData.username]: false });
+            StringifyAndSavePropertyData(`voteData`, parseVotedata);
         };
     };
+}, 10);
+
+let reqque = null
+system.runInterval(async () => {
+    const res = await http.get("http://localhost:20905/");
+    if (res.body !== reqque) {
+        if (reqque == null) {
+            reqque = res.body;
+            return;
+        }
+        reqque = res.body;
+        const parseData = JSON.parse(res.body);
+        switch (parseData.type) {
+            case `command`: {
+                executeCommand(parseData.data, false);
+                break;
+            };
+            case `ban`: {
+                const rawDeviceIds = DyProp.getDynamicProperty("deviceIds") || "[]";
+                const deviceIds = JSON.parse(rawDeviceIds);
+                /**
+                 * @type {Player}
+                 */
+                const targetPlayers = world.getPlayers({ name: parseData.user });
+                if (targetPlayers.length == 0) return;
+                const target = targetPlayers[0];
+                const playerRawDataBefore = target.getDynamicProperty("accountData");
+                /**
+                 * @type {{ "deviceId": [string] , "id": string , "xuid": string }}
+                 */
+                const playerParseDataBefore = JSON.parse(playerRawDataBefore);
+                for (let deviceId of playerParseDataBefore.deviceId) {
+                    if (!deviceIds.includes(deviceId)) {
+                        deviceIds.push(deviceId);
+                    };
+                };
+                DyProp.setDynamicProperty("deviceIds", JSON.stringify(deviceIds));
+
+                if (parseData?.reason != "") target.setDynamicProperty(`banReason`, parseData?.reason);
+                target.setDynamicProperty(`isBan`, true);
+                target.runCommand(`kick "${playerParseDataBefore.xuid}" §c§lあなたはBANされています\nReason: ${parseData?.reason}`);
+                world.sendMessage(`§a[KaronNetWork BAN System]§r\n${target.name} §r§7の接続を拒否しました`);
+                break;
+            };
+            case `mute`: {
+                const targetPlayers = world.getPlayers({ name: parseData.user });
+                if (targetPlayers.length == 0) return;
+                const target = targetPlayers[0];
+                target.setDynamicProperty(`isMute`, true);
+                break;
+            };
+            case `unmute`: {
+                const targetPlayers = world.getPlayers({ name: parseData.user });
+                if (targetPlayers.length == 0) return;
+                const target = targetPlayers[0];
+                target.setDynamicProperty(`isMute`);
+                break;
+            };
+            case `unban`: {
+                world.getDimension(`overworld`).runCommand(`scriptevent karo:unban ${parseData.user}`);
+                break;
+            };
+        };
+    }
 }, 10);
 
 world.afterEvents.entityDie.subscribe(async (ev) => {
@@ -197,56 +262,56 @@ world.afterEvents.entityDie.subscribe(async (ev) => {
 });
 
 world.beforeEvents.chatSend.subscribe(event => {
-    const {sender , message} = event;
-    if(message === "?vote") {
+    const { sender, message } = event;
+    if (message === "?vote") {
         event.cancel = true;
         system.run(() => {
             const data = DyProp.getDynamicProperty(`voteData`);
-            if(!data) return;
+            if (!data) return;
             const parseData = JSON.parse(data);
-            if(!Object.keys(parseData).includes(`${sender.name}`)) {
+            if (!Object.keys(parseData).includes(`${sender.name}`)) {
                 sender.sendMessage(`§cあなたは投票していません`);
                 return;
             };
-            if(parseData[`${sender.name}`] == true) {
+            if (parseData[`${sender.name}`] == true) {
                 sender.sendMessage(`§cあなたは既に今日の報酬を受け取っています`);
                 return;
             }
-            if(parseData[`${sender.name}`] == false) {
+            if (parseData[`${sender.name}`] == false) {
                 //housyuuageru syorisiro
                 sender.runCommand(`give @s karo:ticket`);
                 sender.sendMessage(`§a報酬を受け取りました`);
                 parseData[`${sender.name}`] = true;
-                StringifyAndSavePropertyData(`voteData`,parseData);
+                StringifyAndSavePropertyData(`voteData`, parseData);
                 return;
             };
         })
     };
-    if(message === "?login") {
+    if (message === "?login") {
         event.cancel = true;
         system.run(() => {
-        const data = DyProp.getDynamicProperty(`loginData`);
-        if(!data) return;
-        const parseData = JSON.parse(data);
-        if(parseData[`${sender.name}`] == true) {
-            sender.sendMessage(`§cあなたは既に今日の報酬を受け取っています`);
-            return;
-        }
-        if(!parseData[`${sender.name}`]) {
-            //housyuuageru syorisiro
-            sender.runCommand(`give @s karo:login_ticket`);
-            sender.sendMessage(`§a報酬を受け取りました`);
-            parseData[`${sender.name}`] = true;
-            StringifyAndSavePropertyData(`loginData`,parseData);
-            return;
-        };
-    })
+            const data = DyProp.getDynamicProperty(`loginData`);
+            if (!data) return;
+            const parseData = JSON.parse(data);
+            if (parseData[`${sender.name}`] == true) {
+                sender.sendMessage(`§cあなたは既に今日の報酬を受け取っています`);
+                return;
+            }
+            if (!parseData[`${sender.name}`]) {
+                //housyuuageru syorisiro
+                sender.runCommand(`give @s karo:login_ticket`);
+                sender.sendMessage(`§a報酬を受け取りました`);
+                parseData[`${sender.name}`] = true;
+                StringifyAndSavePropertyData(`loginData`, parseData);
+                return;
+            };
+        })
     };
 });
 
 world.afterEvents.entityDie.subscribe(async (ev) => {
     const { deadEntity, damageSource } = ev;
-    if(!killLogCheckEntityIds.includes(`${deadEntity?.typeId}`)) return;
+    if (!killLogCheckEntityIds.includes(`${deadEntity?.typeId}`)) return;
     try {
         const { x, y, z } = deadEntity.location;
         const req = new HttpRequest("http://localhost:20005/");
@@ -265,7 +330,7 @@ world.afterEvents.entityDie.subscribe(async (ev) => {
             new HttpHeader("Content-Type", "application/json")
         ];
         await http.request(req);
-    } catch (error) {};
+    } catch (error) { };
 });
 /*
 world.afterEvents.playerPlaceBlock.subscribe(async (ev) => {
