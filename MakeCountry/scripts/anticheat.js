@@ -345,7 +345,7 @@ function inventoryCheck(player, target) {
                 return;
             };
         };
-        if (17 < rs.selection && rs.selection < 55) {
+        if (8 < rs.selection && rs.selection < 55) {
             const item = inventory.getItem(rs.selection - 9);
             if (item) {
                 player.sendMessage(`§a${target.name}のインベントリから${item.nameTag || item.typeId} を奪いました`);
