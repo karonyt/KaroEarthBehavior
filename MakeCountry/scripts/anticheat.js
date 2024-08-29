@@ -21,7 +21,7 @@ world.afterEvents.playerSpawn.subscribe(async (ev) => {
      * @type {{"command": "listd", "result": [{ "deviceSessionId": string , "id": number , "xuid": string }]}}
      */
     system.runTimeout(async () => {
-        const data =  JSON.parse(await executeCommand(`listd`, true).split(`\n`)[2].substring(5));
+        const data = JSON.parse(await executeCommand(`listd`, true).split(`\n`)[2].substring(5));
         const playerData = data.result.find((d) => `${d.id}` === player.id);
         if (!playerData) {
             player.runCommand(`kick "${player.name}" §c§l不正なアカウント`);
@@ -34,22 +34,22 @@ world.afterEvents.playerSpawn.subscribe(async (ev) => {
          * @type {{ "deviceId": [string] , "id": string , "xuid": string }}
          */
         const playerParseDataBefore = JSON.parse(playerRawDataBefore);
-    
+
         if (!playerParseDataBefore.deviceId.includes(playerData.deviceSessionId)) {
             playerParseDataBefore.deviceId.push(playerData.deviceSessionId);
             player.setDynamicProperty("accountData", JSON.stringify(playerParseDataBefore));
         };
-    
+
         if (!player.getDynamicProperty("accountData")) {
             player.setDynamicProperty("accountData", JSON.stringify(playerParseDataBefore));
         };
-    
+
         if (unbanList.includes(`${player.name}`) && player.getDynamicProperty(`isBan`)) {
             player.setDynamicProperty(`isBan`);
             player.sendMessage(`§a§lあなたのBANが解除されました`);
             world.sendMessage(`§a§l[KaronNetWork BAN System]§r\n${player.name} §r§7のBANを解除しました`);
             for (const deviceId of playerParseDataBefore.deviceId) {
-                if(deviceIds.includes(deviceId)) {
+                if (deviceIds.includes(deviceId)) {
                     deviceIds.splice(deviceIds.indexOf(deviceId), 1);
                 };
             };
@@ -68,7 +68,7 @@ world.afterEvents.playerSpawn.subscribe(async (ev) => {
                 return;
             }
         }
-    
+
         if (banList.includes(`${player.name}`)) {
             const reason = player.getDynamicProperty(`banReason`) || "";
             player.setDynamicProperty(`isBan`, true);
@@ -98,7 +98,7 @@ world.afterEvents.playerSpawn.subscribe(async (ev) => {
             player.setDynamicProperty(`isMute`);
             return;
         };
-    },2);
+    }, 2);
 });
 
 /**
@@ -360,6 +360,15 @@ function inventoryCheck(player, target) {
         player.sendMessage(`§c無効なフィールド`);
     });
 };
+
+/**
+ * @param {string} action
+ * @param {unknown} payload
+ */
+function sendAction(action, payload) {
+    const json = JSON.stringify({ action, payload });
+    console.warn(`bds_enhancer:${json}`);
+}
 
 /**
  * @type {{command: string, resolve: (value: string) => void, resultTmp: string}[]}
