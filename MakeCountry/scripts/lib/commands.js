@@ -48,7 +48,7 @@ class ChatHandler {
         world.sendMessage([{ text: `<§${this.playerCountryData?.color ?? `a`}` }, { translate: land }, { text: ` §r| ${this.sender.name}> ${this.message}` }]);
         system.run(async () => {
             const req = new HttpRequest(BotHttpURL);
-            if(land === `chat.player.no.join.any.country`) land = `無所属`;
+            if (land === `chat.player.no.join.any.country`) land = `無所属`;
             req.body = JSON.stringify({
                 land: `<§${this.playerCountryData?.color ?? `a`}${land}§r| ${this.sender.name}> `,
                 senderName: this.event.sender.name,
@@ -318,9 +318,17 @@ class ChatHandler {
             this.sender.sendMessage({ translate: `command.permission.error` });
             return;
         };
-        DyProp.setDynamicProperty(GetPlayerChunkPropertyId(this.sender));
+        const chunkId = GetPlayerChunkPropertyId(this.sender);
+        const chunkData = GetAndParsePropertyData(chunkId);
+        if (chunkData) {
+            if (chunkData?.countryId) {
+                const countryData = GetAndParsePropertyData(`country_${chunkData?.countryId}`);
+                countryData.territories.splice(countryData.territories.indexOf(chunkId), 1);
+                StringifyAndSavePropertyData(`country_${chunkData?.countryId}`, countryData);
+            };
+        };
+        DyProp.setDynamicProperty(chunkId);
         this.sender.sendMessage({ translate: `command.resetchunk.result`, with: { rawtext: [{ translate: `wilderness.name` }] } });
-
     };
 
     buyChunk() {
@@ -589,14 +597,14 @@ class ChatHandler {
             return;
         };
         const isCamera = this.sender.hasTag(`mc_camera`);
-        if(isCamera) {
+        if (isCamera) {
             this.sender.camera.clear();
             this.sender.removeTag(`mc_camera`);
             return;
         };
-        if(!isCamera) {
+        if (!isCamera) {
             this.sender.addTag(`mc_camera`);
-            this.sender.camera.setCamera(`minecraft:free`,{location: this.sender.getHeadLocation(),rotation: this.sender.getRotation()});
+            this.sender.camera.setCamera(`minecraft:free`, { location: this.sender.getHeadLocation(), rotation: this.sender.getRotation() });
             return;
         };
         return;
@@ -604,13 +612,13 @@ class ChatHandler {
 };
 
 world.beforeEvents.chatSend.subscribe(event => {
-    if(event.sender.hasTag(`moderator`) && event.message.startsWith(`!`)) return;
+    if (event.sender.hasTag(`moderator`) && event.message.startsWith(`!`)) return;
     if (event.message === `?tp` || event.message === `?lobby` || event.message === `?vote` || event.message === `?login`) return;
     const chatHandler = new ChatHandler(event);
     if (chatHandler.isCommand()) {
         chatHandler.handleCommand();
     } else {
-        if(event.sender.getDynamicProperty(`isMute`) && !event.sender.hasTag(`moderator`)) return;
+        if (event.sender.getDynamicProperty(`isMute`) && !event.sender.hasTag(`moderator`)) return;
         chatHandler.handleChat();
     };
 });
