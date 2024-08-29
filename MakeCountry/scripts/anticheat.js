@@ -20,83 +20,85 @@ world.afterEvents.playerSpawn.subscribe(async (ev) => {
     /**
      * @type {{"command": "listd", "result": [{ "deviceSessionId": string , "id": number , "xuid": string }]}}
      */
-    const data = await JSON.parse(executeCommand(`listd`, true).split(`\n`)[2].substring(5));
-    const playerData = data.result.find((d) => `${d.id}` === player.id);
-    if (!playerData) {
-        player.runCommand(`kick "${player.name}" §c§l不正なアカウント`);
-        world.sendMessage(`§a§l[KaronNetWork BAN System]\n§r§7不正なアカウント: ${player.name} の接続を拒否しました`);
-        return;
-    };
-    const savePlayerData = { xuid: playerData.xuid, id: `${playerData.id}`, deviceId: [playerData.deviceSessionId] };
-    const playerRawDataBefore = player.getDynamicProperty("accountData") || JSON.stringify(savePlayerData);
-    /**
-     * @type {{ "deviceId": [string] , "id": string , "xuid": string }}
-     */
-    const playerParseDataBefore = JSON.parse(playerRawDataBefore);
-
-    if (!playerParseDataBefore.deviceId.includes(playerData.deviceSessionId)) {
-        playerParseDataBefore.deviceId.push(playerData.deviceSessionId);
-        player.setDynamicProperty("accountData", JSON.stringify(playerParseDataBefore));
-    };
-
-    if (!player.getDynamicProperty("accountData")) {
-        player.setDynamicProperty("accountData", JSON.stringify(playerParseDataBefore));
-    };
-
-    if (unbanList.includes(`${player.name}`) && player.getDynamicProperty(`isBan`)) {
-        player.setDynamicProperty(`isBan`);
-        player.sendMessage(`§a§lあなたのBANが解除されました`);
-        world.sendMessage(`§a§l[KaronNetWork BAN System]§r\n${player.name} §r§7のBANを解除しました`);
-        for (const deviceId of playerParseDataBefore.deviceId) {
-            if(deviceIds.includes(deviceId)) {
-                deviceIds.splice(deviceIds.indexOf(deviceId), 1);
-            };
+    system.runTimeout(async () => {
+        const data =  JSON.parse(await executeCommand(`listd`, true).split(`\n`)[2].substring(5));
+        const playerData = data.result.find((d) => `${d.id}` === player.id);
+        if (!playerData) {
+            player.runCommand(`kick "${player.name}" §c§l不正なアカウント`);
+            world.sendMessage(`§a§l[KaronNetWork BAN System]\n§r§7不正なアカウント: ${player.name} の接続を拒否しました`);
+            return;
         };
-        DyProp.setDynamicProperty("deviceIds", JSON.stringify(deviceIds));
-        return;
-    };
-    for (const banedDeviceId of deviceIds) {
-        if (banedDeviceId === playerData.deviceSessionId) {
+        const savePlayerData = { xuid: playerData.xuid, id: `${playerData.id}`, deviceId: [playerData.deviceSessionId] };
+        const playerRawDataBefore = player.getDynamicProperty("accountData") || JSON.stringify(savePlayerData);
+        /**
+         * @type {{ "deviceId": [string] , "id": string , "xuid": string }}
+         */
+        const playerParseDataBefore = JSON.parse(playerRawDataBefore);
+    
+        if (!playerParseDataBefore.deviceId.includes(playerData.deviceSessionId)) {
+            playerParseDataBefore.deviceId.push(playerData.deviceSessionId);
+            player.setDynamicProperty("accountData", JSON.stringify(playerParseDataBefore));
+        };
+    
+        if (!player.getDynamicProperty("accountData")) {
+            player.setDynamicProperty("accountData", JSON.stringify(playerParseDataBefore));
+        };
+    
+        if (unbanList.includes(`${player.name}`) && player.getDynamicProperty(`isBan`)) {
+            player.setDynamicProperty(`isBan`);
+            player.sendMessage(`§a§lあなたのBANが解除されました`);
+            world.sendMessage(`§a§l[KaronNetWork BAN System]§r\n${player.name} §r§7のBANを解除しました`);
+            for (const deviceId of playerParseDataBefore.deviceId) {
+                if(deviceIds.includes(deviceId)) {
+                    deviceIds.splice(deviceIds.indexOf(deviceId), 1);
+                };
+            };
+            DyProp.setDynamicProperty("deviceIds", JSON.stringify(deviceIds));
+            return;
+        };
+        for (const banedDeviceId of deviceIds) {
+            if (banedDeviceId === playerData.deviceSessionId) {
+                player.setDynamicProperty(`isBan`, true);
+                player.runCommand(`kick "${playerData.xuid}" §c§lあなたはBANされています\nReason: ${banedDeviceId}のデバイスからの接続を拒否しました`);
+                world.sendMessage(`§a§l[KaronNetWork BAN System]§r\n${player.name} §r§7の接続を拒否しました`);
+                if (!playerParseDataBefore.deviceId.includes(playerData.deviceSessionId)) {
+                    deviceIds.push(playerData.deviceSessionId);
+                    DyProp.setDynamicProperty("deviceIds", JSON.stringify(deviceIds));
+                };
+                return;
+            }
+        }
+    
+        if (banList.includes(`${player.name}`)) {
+            const reason = player.getDynamicProperty(`banReason`) || "";
             player.setDynamicProperty(`isBan`, true);
-            player.runCommand(`kick "${playerData.xuid}" §c§lあなたはBANされています\nReason: ${banedDeviceId}のデバイスからの接続を拒否しました`);
+            player.runCommand(`kick "${player.name}" §c§lあなたはBANされています\nReason: ${reason}`);
             world.sendMessage(`§a§l[KaronNetWork BAN System]§r\n${player.name} §r§7の接続を拒否しました`);
             if (!playerParseDataBefore.deviceId.includes(playerData.deviceSessionId)) {
                 deviceIds.push(playerData.deviceSessionId);
                 DyProp.setDynamicProperty("deviceIds", JSON.stringify(deviceIds));
             };
             return;
-        }
-    }
-
-    if (banList.includes(`${player.name}`)) {
-        const reason = player.getDynamicProperty(`banReason`) || "";
-        player.setDynamicProperty(`isBan`, true);
-        player.runCommand(`kick "${player.name}" §c§lあなたはBANされています\nReason: ${reason}`);
-        world.sendMessage(`§a§l[KaronNetWork BAN System]§r\n${player.name} §r§7の接続を拒否しました`);
-        if (!playerParseDataBefore.deviceId.includes(playerData.deviceSessionId)) {
-            deviceIds.push(playerData.deviceSessionId);
-            DyProp.setDynamicProperty("deviceIds", JSON.stringify(deviceIds));
         };
-        return;
-    };
-    if (player.getDynamicProperty(`isBan`)) {
-        const reason = player.getDynamicProperty(`banReason`) || "";
-        player.runCommand(`kick "${player.name}" §c§lあなたはBANされています\nReason: ${reason}`);
-        world.sendMessage(`§a§l[KaronNetWork BAN System]§r\n${player.name} §r§7の接続を拒否しました`);
-        if (!playerParseDataBefore.deviceId.includes(playerData.deviceSessionId)) {
-            deviceIds.push(playerData.deviceSessionId);
-            DyProp.setDynamicProperty("deviceIds", JSON.stringify(deviceIds));
+        if (player.getDynamicProperty(`isBan`)) {
+            const reason = player.getDynamicProperty(`banReason`) || "";
+            player.runCommand(`kick "${player.name}" §c§lあなたはBANされています\nReason: ${reason}`);
+            world.sendMessage(`§a§l[KaronNetWork BAN System]§r\n${player.name} §r§7の接続を拒否しました`);
+            if (!playerParseDataBefore.deviceId.includes(playerData.deviceSessionId)) {
+                deviceIds.push(playerData.deviceSessionId);
+                DyProp.setDynamicProperty("deviceIds", JSON.stringify(deviceIds));
+            };
+            return;
         };
-        return;
-    };
-    if (muteList.includes(`${player.name}`)) {
-        player.setDynamicProperty(`isMute`, true);
-        return;
-    };
-    if (unmuteList.includes(`${player.name}`) && player.getDynamicProperty(`isMute`)) {
-        player.setDynamicProperty(`isMute`);
-        return;
-    };
+        if (muteList.includes(`${player.name}`)) {
+            player.setDynamicProperty(`isMute`, true);
+            return;
+        };
+        if (unmuteList.includes(`${player.name}`) && player.getDynamicProperty(`isMute`)) {
+            player.setDynamicProperty(`isMute`);
+            return;
+        };
+    },2);
 });
 
 /**
