@@ -21,7 +21,14 @@ world.afterEvents.playerSpawn.subscribe(async (ev) => {
      * @type {{"command": "listd", "result": [{ "deviceSessionId": string , "id": number , "xuid": string }]}}
      */
     system.runTimeout(async () => {
-        const data = JSON.parse(await executeCommand(`listd`, true).split(`\n`)[2].substring(5));
+        const commandResult = await executeCommand(`listd`, true);
+        let data
+        try {
+            data = JSON.parse(commandResult.split(`\n`)[2].substring(5));
+        } catch (error) {
+            data = { "result": [{ "id": "Not Found" }] }
+        }
+
         const playerData = data.result.find((d) => `${d.id}` === player.id);
         if (!playerData) {
             player.runCommand(`kick "${player.name}" §c§l不正なアカウント`);
