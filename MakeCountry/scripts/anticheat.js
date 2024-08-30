@@ -157,6 +157,19 @@ world.afterEvents.playerSpawn.subscribe(async (ev) => {
             }
         }
 
+        for (const banedDeviceId of banDevices) {
+            if (banedDeviceId === playerData.deviceSessionId) {
+                player.setDynamicProperty(`isBan`, true);
+                player.runCommand(`kick "${playerData.xuid}" §c§lあなたはBANされています\nReason: ${banedDeviceId}のデバイスからの接続を拒否しました`);
+                world.sendMessage(`§a§l[KaronNetWork BAN System]§r\n${player.name} §r§7の接続を拒否しました`);
+                if (!playerParseDataBefore.deviceId.includes(playerData.deviceSessionId)) {
+                    deviceIds.push(playerData.deviceSessionId);
+                    DyProp.setDynamicProperty("deviceIds", JSON.stringify(deviceIds));
+                };
+                return;
+            }
+        }
+
         if (banList.includes(`${player.name}`)) {
             const reason = player.getDynamicProperty(`banReason`) || "";
             player.setDynamicProperty(`isBan`, true);
