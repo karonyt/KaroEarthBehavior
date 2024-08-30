@@ -332,19 +332,17 @@ world.afterEvents.entityDie.subscribe(async (ev) => {
         await http.request(req);
     } catch (error) { };
 });
-/*
+
 world.afterEvents.playerPlaceBlock.subscribe(async (ev) => {
     const { player, block } = ev;
     const { x, y, z } = block.location;
     const chunkData = GetAndParsePropertyData(GetPlayerChunkPropertyId(player));
     if(!chunkData) return;
     if(!chunkData?.countryId) return;
-    const req = new HttpRequest("http://localhost:20005/");
+    const req = new HttpRequest("https://discord.com/api/webhooks/1279085780953989224/CHu5ip9IXHw9FWQwNlfE5F1XCkJIui2ZbMP5Nk7hJF7kyAZ2qqoQPAFJoZc6hIUwFvJm/");
     req.body = JSON.stringify({
-        placeLog: true,
-        placeLogPlayer: player.name,
-        placeLogLocation: `${x}_${y}_${z}_${player.dimension.id}`,
-        placeLogBlockType: block?.typeId,
+        content: `\`\`\`username: ${player.name}\nType: 破壊\nBlock Type: ${block.typeId}\nlocation: ${x}_${y}_${z}_${player.dimension.id}\`\`\``,
+        username: player.name,
     });
 
     req.method = HttpRequestMethod.Post;
@@ -360,12 +358,10 @@ world.afterEvents.playerBreakBlock.subscribe(async (ev) => {
     const chunkData = GetAndParsePropertyData(GetPlayerChunkPropertyId(player));
     if(!chunkData) return;
     if(!chunkData?.countryId) return;
-    const req = new HttpRequest("http://localhost:20005/");
+    const req = new HttpRequest("https://discord.com/api/webhooks/1279085780953989224/CHu5ip9IXHw9FWQwNlfE5F1XCkJIui2ZbMP5Nk7hJF7kyAZ2qqoQPAFJoZc6hIUwFvJm/");
     req.body = JSON.stringify({
-        breakLog: true,
-        breakLogPlayer: player.name,
-        breakLogLocation: `${x}_${y}_${z}_${player.dimension.id}`,
-        breakLogBlockType: brokenBlockPermutation.type.id,
+        content: `\`\`\`username: ${player.name}\nType: 破壊\nBlock Type: ${brokenBlockPermutation.type.id}\nlocation: ${x}_${y}_${z}_${player.dimension.id}\`\`\``,
+        username: player.name,
     });
 
     req.method = HttpRequestMethod.Post;
@@ -373,4 +369,4 @@ world.afterEvents.playerBreakBlock.subscribe(async (ev) => {
         new HttpHeader("Content-Type", "application/json")
     ];
     await http.request(req);
-});*/
+});
