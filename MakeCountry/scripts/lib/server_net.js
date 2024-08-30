@@ -339,10 +339,12 @@ world.afterEvents.playerPlaceBlock.subscribe(async (ev) => {
     const chunkData = GetAndParsePropertyData(GetPlayerChunkPropertyId(player));
     if(!chunkData) return;
     if(!chunkData?.countryId) return;
-    const req = new HttpRequest("https://discord.com/api/webhooks/1279085780953989224/CHu5ip9IXHw9FWQwNlfE5F1XCkJIui2ZbMP5Nk7hJF7kyAZ2qqoQPAFJoZc6hIUwFvJm/");
+    const req = new HttpRequest("http://localhost:20005/");
     req.body = JSON.stringify({
-        content: `\`\`\`username: ${player.name}\nType: 破壊\nBlock Type: ${block.typeId}\nlocation: ${x}_${y}_${z}_${player.dimension.id}\`\`\``,
-        username: player.name,
+        placeLog: true,
+        placeLogPlayer: player.name,
+        placeLogLocation: `${x}_${y}_${z}_${player.dimension.id}`,
+        placeLogBlockType: block?.typeId,
     });
 
     req.method = HttpRequestMethod.Post;
@@ -358,10 +360,12 @@ world.afterEvents.playerBreakBlock.subscribe(async (ev) => {
     const chunkData = GetAndParsePropertyData(GetPlayerChunkPropertyId(player));
     if(!chunkData) return;
     if(!chunkData?.countryId) return;
-    const req = new HttpRequest("https://discord.com/api/webhooks/1279085780953989224/CHu5ip9IXHw9FWQwNlfE5F1XCkJIui2ZbMP5Nk7hJF7kyAZ2qqoQPAFJoZc6hIUwFvJm/");
+    const req = new HttpRequest("http://localhost:20005/");
     req.body = JSON.stringify({
-        content: `\`\`\`username: ${player.name}\nType: 破壊\nBlock Type: ${brokenBlockPermutation.type.id}\nlocation: ${x}_${y}_${z}_${player.dimension.id}\`\`\``,
-        username: player.name,
+        breakLog: true,
+        breakLogPlayer: player.name,
+        breakLogLocation: `${x}_${y}_${z}_${player.dimension.id}`,
+        breakLogBlockType: brokenBlockPermutation.type.id,
     });
 
     req.method = HttpRequestMethod.Post;
