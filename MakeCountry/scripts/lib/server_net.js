@@ -311,7 +311,7 @@ world.beforeEvents.chatSend.subscribe(event => {
 
 world.afterEvents.entityDie.subscribe(async (ev) => {
     const { deadEntity, damageSource } = ev;
-    if (!killLogCheckEntityIds.includes(`${deadEntity?.typeId}`)) return;
+    //if (!killLogCheckEntityIds.includes(`${deadEntity?.typeId}`)) return;
     try {
         const { x, y, z } = deadEntity.location;
         const req = new HttpRequest("http://localhost:20005/");
@@ -336,9 +336,6 @@ world.afterEvents.entityDie.subscribe(async (ev) => {
 world.afterEvents.playerPlaceBlock.subscribe(async (ev) => {
     const { player, block } = ev;
     const { x, y, z } = block.location;
-    const chunkData = GetAndParsePropertyData(GetPlayerChunkPropertyId(player));
-    if(!chunkData) return;
-    if(!chunkData?.countryId) return;
     const req = new HttpRequest("http://localhost:20005/");
     req.body = JSON.stringify({
         placeLog: true,
@@ -357,9 +354,6 @@ world.afterEvents.playerPlaceBlock.subscribe(async (ev) => {
 world.afterEvents.playerBreakBlock.subscribe(async (ev) => {
     const { player, brokenBlockPermutation, block } = ev;
     const { x, y, z } = block.location;
-    const chunkData = GetAndParsePropertyData(GetPlayerChunkPropertyId(player));
-    if(!chunkData) return;
-    if(!chunkData?.countryId) return;
     const req = new HttpRequest("http://localhost:20005/");
     req.body = JSON.stringify({
         breakLog: true,
