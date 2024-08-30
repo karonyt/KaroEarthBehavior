@@ -410,6 +410,10 @@ export function sendMoneyCheckForm(sendPlayer, receivePlayer) {
         };
         const receivePlayerData = GetAndParsePropertyData(`player_${receivePlayer.id}`);
         const sendPlayerData2 = GetAndParsePropertyData(`player_${sendPlayer.id}`);
+        if (sendPlayerData2.money < value) {
+            sendPlayer.sendMessage({ translate: `command.error.trysend.moremoney.youhave`, with: [`${sendPlayerData2.money}`] });
+            return;
+        };
         receivePlayerData.money += value;
         sendPlayerData2.money -= value;
         sendPlayerData2.money = Math.floor(sendPlayerData2.money * 100) / 100;
