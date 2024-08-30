@@ -66,7 +66,6 @@ system.runInterval(() => {
                 } else {
                     playerData.money -= countryData.taxPer;
                     countryData.money += countryData.taxPer;
-
                 };
                 StringifyAndSavePropertyData(pId, playerData);
                 StringifyAndSavePropertyData(`country_${countryData.id}`, countryData);
@@ -85,13 +84,17 @@ system.runInterval(() => {
             };
             let upkeepCosts = config.MaintenanceFeeNonPeacefulCountries * countryData.territories.length;
             if (countryData.peace) upkeepCosts = config.MaintenanceFeePacifistCountries * countryData.territories.length;
-            if (countryData.money < upkeepCosts) {
+            if(typeof countryData?.money == "number") {
+                if (countryData.money < upkeepCosts) {
+                    countryData.money = 0;
+                    StringifyAndSavePropertyData(`country_${countryData.id}`, countryData);
+                    DeleteCountry(countryData.id);
+                    continue;
+                };
+                countryData.money -= upkeepCosts;    
+            } else {
                 countryData.money = 0;
-                StringifyAndSavePropertyData(`country_${countryData.id}`, countryData);
-                DeleteCountry(countryData.id);
-                continue;
             };
-            countryData.money -= upkeepCosts;
             StringifyAndSavePropertyData(`country_${countryData.id}`, countryData);
         };
     };
