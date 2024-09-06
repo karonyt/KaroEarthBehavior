@@ -5,7 +5,8 @@ import { itemIdToPath } from "./texture_config";
 import * as DyProp from "./lib/DyProp";
 
 const unbanList = [];
-const banList = [`giyokundaK`, `bedrock6gatu`, `D Berlin98`, `reizylake`, `freeway46390`, `Harukixx1008`, "Abell3653",
+const banList = [
+    `giyokundaK`, `bedrock6gatu`, `D Berlin98`, `reizylake`, `freeway46390`, `Harukixx1008`, "Abell3653",
     "AboveHaddock178", "AftLettuce55996", "AgateRhino99915", "aim toppi", "aiueo0106", "akakki123", "akikann0136", "alex00123030", "Amekun6305", "amoiz", "anime to1053", "Anthony4933",
     "AntiStarling473", "AQWSEDZRF", "ARON brother", "asuma6", "Ata9Client", "ATNF10", "AudioLamp263003", "ayumu11ryoko", "Baby 0728",
     "BlandSquirrel48", "BlessingSumo858", "bokutiro012", "BossLamb7162256","BOT mumei 23", "BoxingBoat66122", "brack dream", "BrokenBow791",
