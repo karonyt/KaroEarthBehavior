@@ -192,61 +192,61 @@ export function DeleteCountry(countryId) {
         countryData.roles.forEach(r => {
             DyProp.setDynamicProperty(`role_${r}`);
         });
-    },5);
+    }, 5);
     system.runTimeout(() => {
         countryData.allianceRequestSend.forEach(a => {
             const aCountry = GetAndParsePropertyData(`country_${a}`);
             aCountry.allianceRequestReceive.splice(aCountry.allianceRequestReceive.indexOf(countryData.id), 1);
-            StringifyAndSavePropertyData(`country_${a}`,aCountry);
+            StringifyAndSavePropertyData(`country_${a}`, aCountry);
         });
-    },6);
+    }, 6);
     system.runTimeout(() => {
         countryData.allianceRequestReceive.forEach(a => {
             const aCountry = GetAndParsePropertyData(`country_${a}`);
             aCountry.allianceRequestSend.splice(aCountry.allianceRequestSend.indexOf(countryData.id), 1);
-            StringifyAndSavePropertyData(`country_${a}`,aCountry);
+            StringifyAndSavePropertyData(`country_${a}`, aCountry);
         });
-    },7);
+    }, 7);
     system.runTimeout(() => {
         countryData.applicationPeaceRequestSend.forEach(a => {
             const aCountry = GetAndParsePropertyData(`country_${a}`);
             aCountry.applicationPeaceRequestReceive.splice(aCountry.applicationPeaceRequestReceive.indexOf(countryData.id), 1);
-            StringifyAndSavePropertyData(`country_${a}`,aCountry);
+            StringifyAndSavePropertyData(`country_${a}`, aCountry);
         });
-    },8);
+    }, 8);
     system.runTimeout(() => {
         countryData.applicationPeaceRequestReceive.forEach(a => {
             const aCountry = GetAndParsePropertyData(`country_${a}`);
             aCountry.applicationPeaceRequestSend.splice(aCountry.applicationPeaceRequestSend.indexOf(countryData.id), 1);
-            StringifyAndSavePropertyData(`country_${a}`,aCountry);
+            StringifyAndSavePropertyData(`country_${a}`, aCountry);
         });
-    },9);
+    }, 9);
     system.runTimeout(() => {
         countryData.declarationSend.forEach(a => {
             const aCountry = GetAndParsePropertyData(`country_${a}`);
             aCountry.declarationReceive.splice(aCountry.declarationReceive.indexOf(countryData.id), 1);
-            StringifyAndSavePropertyData(`country_${a}`,aCountry);
+            StringifyAndSavePropertyData(`country_${a}`, aCountry);
         });
-    },10);
+    }, 10);
     system.runTimeout(() => {
         countryData.declarationReceive.forEach(a => {
             const aCountry = GetAndParsePropertyData(`country_${a}`);
             aCountry.declarationSend.splice(aCountry.declarationSend.indexOf(countryData.id), 1);
-            StringifyAndSavePropertyData(`country_${a}`,aCountry);
+            StringifyAndSavePropertyData(`country_${a}`, aCountry);
         });
-    },11);
+    }, 11);
     system.runTimeout(() => {
         countryData.warNowCountries.forEach(a => {
             const aCountry = GetAndParsePropertyData(`country_${a}`);
             aCountry.warNowCountries.splice(aCountry.warNowCountries.indexOf(countryData.id), 1);
-            StringifyAndSavePropertyData(`country_${a}`,aCountry);
+            StringifyAndSavePropertyData(`country_${a}`, aCountry);
         });
-    },12);
+    }, 12);
     system.runTimeout(() => {
         world.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n` }, { translate: `deleted.country`, with: [`${countryData.name}`] }] });
         //ここら辺に国際組織から抜ける処理を追加しておく
-        DyProp.setDynamicProperty(`country_${countryData.id}`);    
-    },13);
+        DyProp.setDynamicProperty(`country_${countryData.id}`);
+    }, 13);
 }
 
 /**
@@ -437,8 +437,8 @@ export function playerCountryJoin(player, countryId) {
     try {
         const countryData = GetAndParsePropertyData(`country_${countryId}`);
         const playerData = GetAndParsePropertyData(`player_${player.id}`);
-        if(playerData.money < 0) {
-            player.sendMessage({translate: `error.cannnot.in.money.minus`})
+        if (playerData.money < 0) {
+            player.sendMessage({ translate: `error.cannnot.in.money.minus` })
             return;
         };
         countryData.members.push(playerData.id);
@@ -486,7 +486,7 @@ export function playerCountryKick(player) {
         for (const roleId of playerRoles) {
             const role = GetAndParsePropertyData(`role_${roleId}`);
             role.members.splice(role.members.indexOf(playerData.id), 1);
-            StringifyAndSavePropertyData(`role_${roleId}`,role);
+            StringifyAndSavePropertyData(`role_${roleId}`, role);
         };
         playerData.roles = [];
         playerData.country = undefined;
