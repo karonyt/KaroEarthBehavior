@@ -623,9 +623,9 @@ class ChatHandler {
         let currentZNum = Number(currentZ);
         let playerCountryId = this.playerData?.country ?? -10;
         let result = [];
-        for (let i = -10; i < 11; i++) {
+        for (let i = 10; i > -11; i--) {
             let jResult = [];
-            for (let j = 10; j < -11; j--) {
+            for (let j = -10; j < 11; j++) {
                 let chunkX = currentXNum + i;
                 let chunkZ = currentZNum + j;
                 let chunkId = `${chunk}_${chunkX}_${chunkZ}_${dimension}`;
@@ -638,13 +638,13 @@ class ChatHandler {
                     };
                 };
                 if (i === 0 && j === 0) {
-                    colorCode = "b"
+                    colorCode = "4"
                 };
-                jResult.push(`§${colorCode}■`);
+                jResult.push(`§${colorCode}O`);
             };
             result.push(jResult.join(``));
         };
-        this.sender.sendMessage(`${result.join(`\n`)}`);
+        this.sender.sendMessage(`§c----------------------------------------------------\n${result.join(`\n`)}\n§c----------------------------------------------------`);
         return;
     };
 };
