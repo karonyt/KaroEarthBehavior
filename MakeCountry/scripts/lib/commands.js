@@ -174,6 +174,9 @@ class ChatHandler {
                 case "camera":
                     this.camera();
                     break;
+                case "map":
+                    this.map();
+                    break;
                 default:
                     this.sender.sendMessage({ translate: `command.unknown.error`, with: [commandName] });
                     break;
@@ -506,6 +509,7 @@ class ChatHandler {
         { translate: `command.help.shop` }, { text: `\n` },
         { translate: `command.help.tpa` }, { text: `\n` },
         { translate: `command.help.camera` }, { text: `\n` },
+        { translate: `command.help.map` }, { text: `\n` },
         { text: `§btp §a:世界各地へテレポートするメニューを表示します\n` },
         { text: `§blobby §a:ロビーにテレポートします\n` },
         { text: `§bvote §a:投票の報酬を受け取ります\n` },
@@ -610,6 +614,37 @@ class ChatHandler {
             this.sender.camera.setCamera(`minecraft:free`, { location: this.sender.getHeadLocation(), rotation: this.sender.getRotation() });
             return;
         };
+        return;
+    };
+    map() {
+        const playerCurrentChunk = GetPlayerChunkPropertyId(this.sender);
+        let [chunk, currentX, currentZ, dimension] = playerCurrentChunk.split(`_`);
+        let currentXNum = Number(currentX);
+        let currentZNum = Number(currentZ);
+        let playerCountryId = this.playerData?.country ?? -10;
+        let result = [];
+        for (const i = -10; i < 11; i++) {
+            let jResult = [];
+            for (const j = 10; j < -11; j--) {
+                let chunkX = currentXNum + i;
+                let chunkZ = currentZNum + j;
+                let chunkId = `${chunk}_${chunkX}_${chunkZ}_${dimension}`;
+                let chunkData = GetAndParsePropertyData(`${chunkId}`);
+                let colorCode = "f"
+                if (chunkData?.countryId) {
+                    colorCode = "e";
+                    if (chunkData?.countryId === this.playerData.country && this.playerData.country != 0) {
+                        colorCode = "a";
+                    };
+                };
+                if (i === 0 && j === 0) {
+                    colorCode = "b"
+                };
+                jResult.push(`§${colorCode}■`);
+            };
+            result.push(jResult.join(``));
+        };
+        this.sender.sendMessage(`${result.join(`\n`)}`);
         return;
     };
 };
