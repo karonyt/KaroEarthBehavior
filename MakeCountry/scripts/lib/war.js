@@ -30,6 +30,7 @@ export function invade(player) {
         player.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n` }, { translate: `invade.error.target.peace` }] });
         return;
     };
+    const date = new Date().getTime()
     //平和主義
     //モブ出す
     //クールタイム
