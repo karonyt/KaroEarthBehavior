@@ -1323,8 +1323,6 @@ export function externalAffairsMainForm(player) {
     //受信した講和申請
     form.button({ translate: `received.application.request` });
 
-    //戦争
-    form.button({ translate: `war` });
     form.show(player).then((rs) => {
         if (rs.canceled) {
             settingCountryInfoForm(player);
@@ -1378,18 +1376,6 @@ export function externalAffairsMainForm(player) {
                 //受信した講和申請
                 if (!CheckPermission(player, `hostilityAdmin`)) {
                     ReceivedApplicationRequestForm(player);
-                    return;
-                } else {
-                    player.sendMessage({ translate: `no.permission` });
-                };
-                break;
-            };
-            case 5: {
-                //宣戦布告
-                if (!CheckPermission(player, `warAdmin`)) {
-                    //form
-                    //かみんぐすーん
-                    player.sendMessage({ translate: `comingsoon.message` });
                     return;
                 } else {
                     player.sendMessage({ translate: `no.permission` });
