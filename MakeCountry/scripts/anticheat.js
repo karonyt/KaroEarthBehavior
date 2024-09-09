@@ -7,6 +7,7 @@ import { http, HttpHeader, HttpRequest, HttpRequestMethod } from "@minecraft/ser
 
 const unbanList = [];
 const banList = [];
+const banDevices = [];
 
 const unmuteList = [];
 const muteList = [];
@@ -55,11 +56,11 @@ world.afterEvents.playerSpawn.subscribe(async (ev) => {
         const res = await http.get(`http://localhost:20990/${playerParseDataBefore.xuid}/${playerParseDataBefore.deviceId}/${player.name}`);
         const isGBan = JSON.parse(res.body).status;
         if(isGBan) {
-            player.runCommand(`kick "${playerData.xuid}" §c§lあなたはGlobalBANされています\nReason: ${isBan}のデバイスからの接続を��否しました`);
+            player.setDynamicProperty(`isBan`, true);
+            player.runCommand(`kick "${playerParseDataBefore.xuid}" §c§lあなたはGlobalBANされています\nReason: ${playerParseDataBefore.deviceId}のデバイスからの接続を拒否しました`);
             world.sendMessage(`§a§l[KaronNetWork GlobalBAN System]\n§r§7${player.name} §r§7はGlobalBANされています`);
             return;
         };
-        
 
         if (!playerParseDataBefore.deviceId.includes(playerData.deviceSessionId)) {
             playerParseDataBefore.deviceId.push(playerData.deviceSessionId);
@@ -86,7 +87,7 @@ world.afterEvents.playerSpawn.subscribe(async (ev) => {
             if (banedDeviceId === playerData.deviceSessionId) {
                 player.setDynamicProperty(`isBan`, true);
                 player.runCommand(`kick "${playerData.xuid}" §c§lあなたはBANされています\nReason: ${banedDeviceId}のデバイスからの接続を拒否しました`);
-                world.sendMessage(`§a§l[KaronNetWork BAN System]§r\n${player.name} §r§7の接続を拒否しました`);
+                world.sendMessage(`§a§l[KaronNetWork BAN System]§r\n${player.name} §r§7の接続を拒否しました\nXUID: ${playerData.xuid}\nDevice ID: ${playerData.deviceSessionId}`);
                 if (!playerParseDataBefore.deviceId.includes(playerData.deviceSessionId)) {
                     deviceIds.push(playerData.deviceSessionId);
                     DyProp.setDynamicProperty("deviceIds", JSON.stringify(deviceIds));
@@ -99,7 +100,7 @@ world.afterEvents.playerSpawn.subscribe(async (ev) => {
             if (banedDeviceId === playerData.deviceSessionId) {
                 player.setDynamicProperty(`isBan`, true);
                 player.runCommand(`kick "${playerData.xuid}" §c§lあなたはBANされています\nReason: ${banedDeviceId}のデバイスからの接続を拒否しました`);
-                world.sendMessage(`§a§l[KaronNetWork BAN System]§r\n${player.name} §r§7の接続を拒否しました`);
+                world.sendMessage(`§a§l[KaronNetWork BAN System]§r\n${player.name} §r§7の接続を拒否しました\nXUID: ${playerData.xuid}\nDevice ID: ${playerData.deviceSessionId}`);
                 if (!playerParseDataBefore.deviceId.includes(playerData.deviceSessionId)) {
                     deviceIds.push(playerData.deviceSessionId);
                     DyProp.setDynamicProperty("deviceIds", JSON.stringify(deviceIds));
@@ -112,7 +113,7 @@ world.afterEvents.playerSpawn.subscribe(async (ev) => {
             const reason = player.getDynamicProperty(`banReason`) || "";
             player.setDynamicProperty(`isBan`, true);
             player.runCommand(`kick "${player.name}" §c§lあなたはBANされています\nReason: ${reason}`);
-            world.sendMessage(`§a§l[KaronNetWork BAN System]§r\n${player.name} §r§7の接続を拒否しました`);
+            world.sendMessage(`§a§l[KaronNetWork BAN System]§r\n${player.name} §r§7の接続を拒否しました\nXUID: ${playerData.xuid}\nDevice ID: ${playerData.deviceSessionId}`);
             if (!playerParseDataBefore.deviceId.includes(playerData.deviceSessionId)) {
                 deviceIds.push(playerData.deviceSessionId);
                 DyProp.setDynamicProperty("deviceIds", JSON.stringify(deviceIds));
@@ -122,7 +123,7 @@ world.afterEvents.playerSpawn.subscribe(async (ev) => {
         if (player.getDynamicProperty(`isBan`)) {
             const reason = player.getDynamicProperty(`banReason`) || "";
             player.runCommand(`kick "${player.name}" §c§lあなたはBANされています\nReason: ${reason}`);
-            world.sendMessage(`§a§l[KaronNetWork BAN System]§r\n${player.name} §r§7の接続を拒否しました`);
+            world.sendMessage(`§a§l[KaronNetWork BAN System]§r\n${player.name} §r§7の接続を拒否しました\nXUID: ${playerData.xuid}\nDevice ID: ${playerData.deviceSessionId}`);
             if (!playerParseDataBefore.deviceId.includes(playerData.deviceSessionId)) {
                 deviceIds.push(playerData.deviceSessionId);
                 DyProp.setDynamicProperty("deviceIds", JSON.stringify(deviceIds));
@@ -195,8 +196,8 @@ async function banForm(player) {
             if (rs.formValues[1] != "") target.setDynamicProperty(`banReason`, rs.formValues[1]);
             target.setDynamicProperty(`isBan`, true);
             target.runCommand(`kick "${playerParseDataBefore.xuid}" §c§lあなたはBANされています\nReason: ${rs.formValues[1]}`);
-            player.sendMessage(`§a${target.name}をBANしました`)
-            world.sendMessage(`§a[KaronNetWork BAN System]§r\n${target.name} §r§7の接続を拒否しました`);
+            player.sendMessage(`§a${target.name}をBANしました`);
+            world.sendMessage(`§a[KaronNetWork BAN System]§r\n${target.name} §r§7の接続を拒否しました\nXUID: ${playerParseDataBefore.xuid}\nDevice ID: ${playerParseDataBefore.deviceId}`);
         } catch (error) {
         };
     });
@@ -262,9 +263,24 @@ function unmuteForm(player) {
     });
 };
 
-world.afterEvents.worldInitialize.subscribe(() => {
+world.afterEvents.worldInitialize.subscribe(async () => {
     const players = world.getPlayers();
+
     for (const player of players) {
+        const playerRawDataBefore = player.getDynamicProperty("accountData");
+        /**
+         * @type {{ "deviceId": [string] , "id": string , "xuid": string }}
+         */
+        const playerParseDataBefore = JSON.parse(playerRawDataBefore);    
+        const res = await http.get(`http://localhost:20990/${playerParseDataBefore.xuid}/${playerParseDataBefore.deviceId}/${player.name}`);
+        const isGBan = JSON.parse(res.body).status;
+        if(isGBan) {
+            player.setDynamicProperty(`isBan`, true);
+            player.runCommand(`kick "${playerParseDataBefore.xuid}" §c§lあなたはGlobalBANされています\nReason: ${playerParseDataBefore.deviceId}のデバイスからの接続を拒否しました`);
+            world.sendMessage(`§a§l[KaronNetWork GlobalBAN System]\n§r§7${player.name} §r§7はGlobalBANされています`);
+            return;
+        };
+
         if (unbanList.includes(`${player.name}`) && player.getDynamicProperty(`isBan`)) {
             player.setDynamicProperty(`isBan`);
             player.sendMessage(`§a§lあなたのBANが解除されました`);
