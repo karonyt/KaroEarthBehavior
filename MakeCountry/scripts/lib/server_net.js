@@ -7,6 +7,8 @@ import * as DyProp from "./DyProp";
 const killLogCheckEntityIds = [`minecraft:parrot`, `minecraft:ender_dragon`, `minecraft:wolf`, `minecraft:cat`, `minecraft:wither`, `minecraft:npc`, `minecraft:villager_v2`, `minecraft:zombie_villager_v2`]
 
 const mcChatChannelId = "1281902314784948276";
+const mcLogChannelId = "1282605398678831164";
+
 
 system.runInterval(async () => {
     const players = world.getPlayers();
@@ -57,19 +59,6 @@ system.runInterval(async () => {
     };
 }, 100);
 
-async function sendToDiscord(data) {
-    const req = new HttpRequest("http://localhost:20005/event/send");
-
-    req.body = JSON.stringify({
-        type: 'send_to_discord',
-        data: data
-    });
-    req.method = HttpRequestMethod.Post;
-    req.headers = [
-        new HttpHeader("Content-Type", "application/json")
-    ];
-    await http.request(req);
-}
 
 async function sendEvent(body) {
     const req = new HttpRequest("http://localhost:20005/event/send");
@@ -82,8 +71,16 @@ async function sendEvent(body) {
     await http.request(req);
 }
 
+async function sendToDiscord(data) {
+    sendEvent({
+        type: 'send_to_discord',
+        data: data
+    });
+}
+
+
 world.afterEvents.worldInitialize.subscribe(async () => {
-    sendToDiscord({
+    await sendToDiscord({
         channelId: mcChatChannelId,
         content: {
             embeds: [
@@ -93,8 +90,7 @@ world.afterEvents.worldInitialize.subscribe(async () => {
                 }
             ]
         }
-    }
-    );
+    });
 });
 
 world.beforeEvents.playerLeave.subscribe(async (ev) => {
@@ -268,18 +264,18 @@ world.afterEvents.entityDie.subscribe(async (ev) => {
     let reason = `Cause: ${damageSource.cause} `;
     if (damageSource?.damagingEntity) reason += `\nEntity: ${damageSource?.damagingEntity?.nameTag || damageSource?.damagingEntity?.typeId}`;
     if (damageSource?.damagingProjectile) reason += `\nProjectile: ${damageSource?.damagingProjectile?.nameTag || damageSource?.damagingProjectile?.typeId}`;
-    const req = new HttpRequest("http://localhost:20005/");
-    req.body = JSON.stringify({
-        deadPlayerName: player?.name,
-        reason: reason
+
+    sendToDiscord({
+        channelId: mcChatChannelId,
+        content: {
+            embeds: [
+                {
+                    color: 0x730099,
+                    description: `[Dead] ${deadPlayerName}\n${reason}`
+                }
+            ]
+        }
     });
-
-    req.method = HttpRequestMethod.Post;
-    req.headers = [
-        new HttpHeader("Content-Type", "application/json")
-    ];
-    await http.request(req);
-
 });
 
 world.beforeEvents.chatSend.subscribe(event => {
@@ -335,46 +331,28 @@ world.afterEvents.entityDie.subscribe(async (ev) => {
     //if (!killLogCheckEntityIds.includes(`${deadEntity?.typeId}`)) return;
     try {
         const { x, y, z } = deadEntity.location;
-        const req = new HttpRequest("http://localhost:20005/");
-        req.body = JSON.stringify({
-            killLog: true,
-            killLogDamager: damageSource?.damagingEntity?.typeId,
-            killLogDamagerName: damageSource?.damagingEntity?.nameTag,
-            killLogDeader: deadEntity?.typeId,
-            killLogDeaderName: deadEntity?.nameTag,
-            killLogCause: damageSource?.cause,
-            killLogLocation: `${Math.floor(x)}_${Math.floor(y)}_${Math.floor(z)}_${deadEntity.dimension.id}`
-        });
 
-        req.method = HttpRequestMethod.Post;
-        req.headers = [
-            new HttpHeader("Content-Type", "application/json")
-        ];
-        await http.request(req);
-        return;
+        await sendToDiscord({
+            channelId: mcLogChannelId,
+            content: `\`\`\`[kill] \nDeaderType: ${deadEntity?.typeId}\nDeaderName: ${deadEntity?.nameTag}\nCause: ${damageSource?.cause}\nDamagerType: ${damageSource?.damagingEntity?.typeId}\nDamagerName: ${damageSource?.damagingEntity?.nameTag}\nLocation: ${Math.floor(x)}_${Math.floor(y)}_${Math.floor(z)}_${deadEntity.dimension.id}\`\`\``
+        });
     } catch (error) { };
 });
 
 world.afterEvents.playerPlaceBlock.subscribe(async (ev) => {
     const { player, block } = ev;
+
     const { x, y, z } = block.location;
+
     const chunkData = GetAndParsePropertyData(GetPlayerChunkPropertyId(player));
+
     //if(!chunkData) return;
     //if(!chunkData?.countryId) return;
-    const req = new HttpRequest("http://localhost:20005/");
-    req.body = JSON.stringify({
-        placeLog: true,
-        placeLogPlayer: player.name,
-        placeLogLocation: `${x}_${y}_${z}_${player.dimension.id}`,
-        placeLogBlockType: block?.typeId,
-    });
 
-    req.method = HttpRequestMethod.Post;
-    req.headers = [
-        new HttpHeader("Content-Type", "application/json")
-    ];
-    await http.request(req);
-    return;
+    await sendToDiscord({
+        channelId: mcLogChannelId,
+        content: `\`\`\`[place] \nPlayerName: ${player.name}\nBlock: ${block?.typeId}\nLocation: ${x}_${y}_${z}_${player.dimension.id}\`\`\``
+    });
 });
 
 world.afterEvents.playerBreakBlock.subscribe(async (ev) => {
@@ -382,19 +360,9 @@ world.afterEvents.playerBreakBlock.subscribe(async (ev) => {
     const { x, y, z } = block.location;
     const chunkData = GetAndParsePropertyData(GetPlayerChunkPropertyId(player));
     //if(!chunkData) return;
-    //if(!chunkData?.countryId) return;
-    const req = new HttpRequest("http://localhost:20005/");
-    req.body = JSON.stringify({
-        breakLog: true,
-        breakLogPlayer: player.name,
-        breakLogLocation: `${x}_${y}_${z}_${player.dimension.id}`,
-        breakLogBlockType: brokenBlockPermutation.type.id,
+    //if(!chunkData?.countryId) return;\
+    await sendToDiscord({
+        channelId: mcLogChannelId,
+        content: `\`\`\`[break] \nPlayerName: ${player.name}\nBlock: ${brokenBlockPermutation.type.id}\nLocation: ${x}_${y}_${z}_${player.dimension.id}\`\`\``
     });
-
-    req.method = HttpRequestMethod.Post;
-    req.headers = [
-        new HttpHeader("Content-Type", "application/json")
-    ];
-    await http.request(req);
-    return;
 });
