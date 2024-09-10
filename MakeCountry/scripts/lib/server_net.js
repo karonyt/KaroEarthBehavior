@@ -6,6 +6,8 @@ import * as DyProp from "./DyProp";
 
 const killLogCheckEntityIds = [`minecraft:parrot`, `minecraft:ender_dragon`, `minecraft:wolf`, `minecraft:cat`, `minecraft:wither`, `minecraft:npc`, `minecraft:villager_v2`, `minecraft:zombie_villager_v2`]
 
+const mcChatChannelId = "1281902314784948276";
+
 system.runInterval(async () => {
     const players = world.getPlayers();
     for (const player of players) {
@@ -55,17 +57,44 @@ system.runInterval(async () => {
     };
 }, 100);
 
-world.afterEvents.worldInitialize.subscribe(async () => {
-    const req = new HttpRequest("http://localhost:20005/");
-    req.body = JSON.stringify({
-        serverStart: true
-    });
+async function sendToDiscord(data) {
+    const req = new HttpRequest("http://localhost:20005/event/send");
 
+    req.body = JSON.stringify({
+        type: 'send_to_discord',
+        data: data
+    });
     req.method = HttpRequestMethod.Post;
     req.headers = [
         new HttpHeader("Content-Type", "application/json")
     ];
     await http.request(req);
+}
+
+async function sendEvent(body) {
+    const req = new HttpRequest("http://localhost:20005/event/send");
+
+    req.body = JSON.stringify(body);
+    req.method = HttpRequestMethod.Post;
+    req.headers = [
+        new HttpHeader("Content-Type", "application/json")
+    ];
+    await http.request(req);
+}
+
+world.afterEvents.worldInitialize.subscribe(async () => {
+    sendToDiscord({
+        channelId: mcChatChannelId,
+        content: {
+            embeds: [
+                {
+                    color: 0x7cfc00,
+                    description: "Server Started"
+                }
+            ]
+        }
+    }
+    );
 });
 
 world.beforeEvents.playerLeave.subscribe(async (ev) => {
@@ -73,17 +102,13 @@ world.beforeEvents.playerLeave.subscribe(async (ev) => {
     const Name = player.name
     const Id = player.id;
     system.runTimeout(async () => {
-        const req = new HttpRequest("http://localhost:20005/");
-        req.body = JSON.stringify({
-            leavePlayerName: Name,
-            minecraftId: Id,
+        await sendEvent({
+            type: 'leave',
+            data: {
+                minecraftId: Id,
+                playerName: Name
+            }
         });
-
-        req.method = HttpRequestMethod.Post;
-        req.headers = [
-            new HttpHeader("Content-Type", "application/json")
-        ];
-        await http.request(req);
     });
 });
 
@@ -96,18 +121,14 @@ world.afterEvents.playerSpawn.subscribe(async (ev) => {
         firstJoin = true;
         player.addTag(`firstJoin`);
     };
-    const req = new HttpRequest("http://localhost:20005/");
-    req.body = JSON.stringify({
-        firstJoin: firstJoin,
-        joinPlayerName: player.name,
-        minecraftId: player.id
+    await sendEvent({
+        type: 'join',
+        data: {
+            firstJoin: firstJoin,
+            minecraftId: player.id,
+            playerName: player.name
+        }
     });
-
-    req.method = HttpRequestMethod.Post;
-    req.headers = [
-        new HttpHeader("Content-Type", "application/json")
-    ];
-    await http.request(req);
 });
 
 let chat = "a";
