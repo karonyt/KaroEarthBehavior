@@ -9,7 +9,7 @@ const killLogCheckEntityIds = [`minecraft:parrot`, `minecraft:ender_dragon`, `mi
 const mcChatChannelId = "1281902314784948276";
 const mcLogChannelId = "1282605398678831164";
 
-
+// リアルタイムマップの情報更新
 system.runInterval(async () => {
     const players = world.getPlayers();
     for (const player of players) {
@@ -78,7 +78,7 @@ async function sendToDiscord(data) {
     });
 }
 
-
+// サーバー開始時にメッセージを表示
 world.afterEvents.worldInitialize.subscribe(async () => {
     await sendToDiscord({
         channelId: mcChatChannelId,
@@ -127,41 +127,61 @@ world.afterEvents.playerSpawn.subscribe(async (ev) => {
     });
 });
 
-let chat = "a";
-let chat2 = "a";
 let chat3 = "a";
-let chatFirst = true;
-let chat2First = true;
 let chat3First = true;
-system.runInterval(async () => {
-    const res = await http.get("http://localhost:20005/");
-    if (res.body !== chat) {
-        chat = res.body;
-        if (chatFirst) {
-            chatFirst = false;
-            return;
-        };
-        const parseData = JSON.parse(res.body);
-        if (parseData.honyakuMessage) {
-            world.sendMessage(`${parseData.honyakuMessage}`);
-        };
-    };
-}, 10);
+// let chat = "a";
+// let chatFirst = true;
+// system.runInterval(async () => {
+//     const res = await http.get("http://localhost:20005");
+//     if (res.body !== chat) {
+//         chat = res.body;
+//         if (chatFirst) {
+//             chatFirst = false;
+//             return;
+//         };
+//         const parseData = JSON.parse(res.body);
+//         if (parseData.honyakuMessage) {
+//             world.sendMessage(`${parseData.honyakuMessage}`);
+//         };
+//     };
+// }, 10);
 
-system.runInterval(async () => {
-    const res = await http.get("http://localhost:20007/");
-    if (res.body !== chat2) {
-        chat2 = res.body;
-        if (chat2First) {
-            chat2First = false;
-            return;
-        };
-        const parseData = JSON.parse(res.body);
-        if (parseData.authorName) {
-            world.sendMessage(`§2 [§bDiscord-§r${parseData.authorName}§2] §r ${parseData.text}`);
-        }
+subscribeEvent();
+// レスポンスに合わせて処理
+async function subscribeEvent() {
+    console.warn('start long polling');
+    const req = new HttpRequest("http://localhost:20005/event/receive");
+    req.timeout = 180;
+    req.method = HttpRequestMethod.Get;
+    const res = await http.request(req);
+    if (res.status == 502) {
+    } else if (res.status != 200) {
+    } else {
+        netEventHandler(res);
+    }
+    subscribeEvent();
+}
+
+function discordChatToMcChat(data) {
+    world.sendMessage(`§2 [§bDiscord-§r${data.authorName}§2] §r ${data.text}`);
+}
+
+function netEventHandler(res) {
+    const events = {
+        discord_chat: discordChatToMcChat
     };
-}, 10);
+    const eventList = JSON.parse(res.body);
+
+    for (const event of eventList) {
+        const type = event.type;
+        const data = event.data;
+        const handler = events[type];
+
+        if (handler) handler(data);
+    }
+}
+
+// vote通知
 system.runInterval(async () => {
     const res = await http.get("http://localhost:20004/");
     const votedata = DyProp.getDynamicProperty(`voteData`);
@@ -176,17 +196,17 @@ system.runInterval(async () => {
         if (parseData.username) {
             let parseVotedata = JSON.parse(votedata);
             world.sendMessage(`§l§6 [VOTE]\n §r§l${parseData.username} §l§aが §f${parseData.server} §aで投票しました`);
-            const req = new HttpRequest("http://localhost:20005/");
-            req.body = JSON.stringify({
-                username: parseData.username,
-                servername: parseData.server
+            await sendToDiscord({
+                channelId: mcChatChannelId,
+                content: {
+                    embeds: [
+                        {
+                            color: 0x0095d9,
+                            description: `Voted!!\n${parseData.username} が ${parseData.server} で投票しました`
+                        }
+                    ]
+                }
             });
-
-            req.method = HttpRequestMethod.Post;
-            req.headers = [
-                new HttpHeader("Content-Type", "application/json")
-            ];
-            await http.request(req);
             if (Object.keys(parseVotedata).includes(`${parseData.username}`)) return;
             Object.assign(parseVotedata, { [parseData.username]: false });
             StringifyAndSavePropertyData(`voteData`, parseVotedata);
@@ -271,13 +291,14 @@ world.afterEvents.entityDie.subscribe(async (ev) => {
             embeds: [
                 {
                     color: 0x730099,
-                    description: `[Dead] ${deadPlayerName}\n${reason}`
+                    description: `[Dead] ${player.name}\n${reason}`
                 }
             ]
         }
     });
 });
 
+// vote,login コマンド
 world.beforeEvents.chatSend.subscribe(event => {
     const { sender, message } = event;
     if (message === "?vote") {
