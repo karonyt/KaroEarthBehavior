@@ -6,8 +6,8 @@ import * as DyProp from "./DyProp";
 
 const killLogCheckEntityIds = [`minecraft:parrot`, `minecraft:ender_dragon`, `minecraft:wolf`, `minecraft:cat`, `minecraft:wither`, `minecraft:npc`, `minecraft:villager_v2`, `minecraft:zombie_villager_v2`]
 
-const mcChatChannelId = "1281902314784948276";
-const mcLogChannelId = "1282605398678831164";
+const mcChatChannelId = "1142839504412098692";
+const mcLogChannelId = "1272571579376603199";
 
 // リアルタイムマップの情報更新
 system.runInterval(async () => {
@@ -60,7 +60,7 @@ system.runInterval(async () => {
 }, 100);
 
 
-async function sendEvent(body) {
+export async function sendEvent(body) {
     const req = new HttpRequest("http://localhost:20005/event/send");
 
     req.body = JSON.stringify(body);
@@ -71,7 +71,7 @@ async function sendEvent(body) {
     await http.request(req);
 }
 
-async function sendToDiscord(data) {
+export async function sendToDiscord(data) {
     sendEvent({
         type: 'send_to_discord',
         data: data
@@ -149,7 +149,6 @@ let chat3First = true;
 subscribeEvent();
 // レスポンスに合わせて処理
 async function subscribeEvent() {
-    console.warn('start long polling');
     const req = new HttpRequest("http://localhost:20005/event/receive");
     req.timeout = 180;
     req.method = HttpRequestMethod.Get;
