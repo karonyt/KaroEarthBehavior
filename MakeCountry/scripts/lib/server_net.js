@@ -127,8 +127,6 @@ world.afterEvents.playerSpawn.subscribe(async (ev) => {
     });
 });
 
-let chat3 = "a";
-let chat3First = true;
 // let chat = "a";
 // let chatFirst = true;
 // system.runInterval(async () => {
@@ -165,9 +163,22 @@ function discordChatToMcChat(data) {
     world.sendMessage(`§2 [§bDiscord-§r${data.authorName}§2] §r ${data.text}`);
 }
 
+function voteNotify(data) {
+    const votedata = DyProp.getDynamicProperty(`voteData`);
+    if (!votedata) return;
+        if (data.userName) {
+            let parseVotedata = JSON.parse(votedata);
+            if (Object.keys(parseVotedata).includes(`${data.userName}`)) return;
+            world.sendMessage(`§l§6 [VOTE]\n §r§l${data.userName} §l§aが §f${data.serverName} §aで投票しました`);
+            Object.assign(parseVotedata, { [data.userName]: false });
+            StringifyAndSavePropertyData(`voteData`, parseVotedata);
+        };
+}
+
 function netEventHandler(res) {
     const events = {
-        discord_chat: discordChatToMcChat
+        discord_chat: discordChatToMcChat,
+        vote:voteNotify
     };
     const eventList = JSON.parse(res.body);
 
@@ -179,39 +190,6 @@ function netEventHandler(res) {
         if (handler) handler(data);
     }
 }
-
-// vote通知
-system.runInterval(async () => {
-    const res = await http.get("http://localhost:20004/");
-    const votedata = DyProp.getDynamicProperty(`voteData`);
-    if (!votedata) return;
-    if (res.body !== chat3) {
-        chat3 = res.body;
-        if (chat3First) {
-            chat3First = false;
-            return;
-        };
-        const parseData = JSON.parse(res.body);
-        if (parseData.username) {
-            let parseVotedata = JSON.parse(votedata);
-            world.sendMessage(`§l§6 [VOTE]\n §r§l${parseData.username} §l§aが §f${parseData.server} §aで投票しました`);
-            await sendToDiscord({
-                channelId: mcChatChannelId,
-                content: {
-                    embeds: [
-                        {
-                            color: 0x0095d9,
-                            description: `Voted!!\n${parseData.username} が ${parseData.server} で投票しました`
-                        }
-                    ]
-                }
-            });
-            if (Object.keys(parseVotedata).includes(`${parseData.username}`)) return;
-            Object.assign(parseVotedata, { [parseData.username]: false });
-            StringifyAndSavePropertyData(`voteData`, parseVotedata);
-        };
-    };
-}, 10);
 
 let reqque = null
 system.runInterval(async () => {
