@@ -8,10 +8,9 @@ import jobs_config from "../jobs_config";
 import config from "../config";
 import { PlayerMarketMainMenu } from "./player_market";
 import { tpaMainForm } from "./tpa";
-import { http, HttpHeader, HttpRequest, HttpRequestMethod } from "@minecraft/server-net";
 import { ShopCommonsMenu } from "./shop";
+import { sendEvent } from "./server_net";
 
-const BotHttpURL = `http://localhost:20005/`;
 
 class ChatHandler {
     constructor(event) {
@@ -47,20 +46,16 @@ class ChatHandler {
         this.event.cancel = true;
         world.sendMessage([{ text: `<§${this.playerCountryData?.color ?? `a`}` }, { translate: land }, { text: ` §r| ${this.sender.name}> ${this.message}` }]);
         system.run(async () => {
-            const req = new HttpRequest(BotHttpURL);
             if (land === `chat.player.no.join.any.country`) land = `無所属`;
-            req.body = JSON.stringify({
-                land: `<§${this.playerCountryData?.color ?? `a`}${land}§r| ${this.sender.name}> `,
-                senderName: this.event.sender.name,
-                text: this.event.message,
-                minecraftId: this.sender.id
-            });
 
-            req.method = HttpRequestMethod.Post;
-            req.headers = [
-                new HttpHeader("Content-Type", "application/json")
-            ];
-            await http.request(req);
+            sendEvent({
+                type: "chat",
+                data: {
+                    minecraftId: this.sender.id,
+                    senderName: this.event.sender.name,
+                    text: this.event.message
+                }
+            });
         });
     };
 

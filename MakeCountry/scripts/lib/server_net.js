@@ -6,6 +6,10 @@ import * as DyProp from "./DyProp";
 
 const killLogCheckEntityIds = [`minecraft:parrot`, `minecraft:ender_dragon`, `minecraft:wolf`, `minecraft:cat`, `minecraft:wither`, `minecraft:npc`, `minecraft:villager_v2`, `minecraft:zombie_villager_v2`]
 
+const mcChatChannelId = "1142839504412098692";
+const mcLogChannelId = "1272571579376603199";
+
+// リアルタイムマップの情報更新
 system.runInterval(async () => {
     const players = world.getPlayers();
     for (const player of players) {
@@ -55,17 +59,38 @@ system.runInterval(async () => {
     };
 }, 100);
 
-world.afterEvents.worldInitialize.subscribe(async () => {
-    const req = new HttpRequest("http://localhost:20005/");
-    req.body = JSON.stringify({
-        serverStart: true
-    });
 
+export async function sendEvent(body) {
+    const req = new HttpRequest("http://localhost:20005/event/send");
+
+    req.body = JSON.stringify(body);
     req.method = HttpRequestMethod.Post;
     req.headers = [
         new HttpHeader("Content-Type", "application/json")
     ];
     await http.request(req);
+}
+
+export async function sendToDiscord(data) {
+    sendEvent({
+        type: 'send_to_discord',
+        data: data
+    });
+}
+
+// サーバー開始時にメッセージを表示
+world.afterEvents.worldInitialize.subscribe(async () => {
+    await sendToDiscord({
+        channelId: mcChatChannelId,
+        content: {
+            embeds: [
+                {
+                    color: 0x7cfc00,
+                    description: "Server Started"
+                }
+            ]
+        }
+    });
 });
 
 world.beforeEvents.playerLeave.subscribe(async (ev) => {
@@ -73,17 +98,13 @@ world.beforeEvents.playerLeave.subscribe(async (ev) => {
     const Name = player.name
     const Id = player.id;
     system.runTimeout(async () => {
-        const req = new HttpRequest("http://localhost:20005/");
-        req.body = JSON.stringify({
-            leavePlayerName: Name,
-            minecraftId: Id,
+        await sendEvent({
+            type: 'leave',
+            data: {
+                minecraftId: Id,
+                playerName: Name
+            }
         });
-
-        req.method = HttpRequestMethod.Post;
-        req.headers = [
-            new HttpHeader("Content-Type", "application/json")
-        ];
-        await http.request(req);
     });
 });
 
@@ -96,55 +117,70 @@ world.afterEvents.playerSpawn.subscribe(async (ev) => {
         firstJoin = true;
         player.addTag(`firstJoin`);
     };
-    const req = new HttpRequest("http://localhost:20005/");
-    req.body = JSON.stringify({
-        firstJoin: firstJoin,
-        joinPlayerName: player.name,
-        minecraftId: player.id
+    await sendEvent({
+        type: 'join',
+        data: {
+            firstJoin: firstJoin,
+            minecraftId: player.id,
+            playerName: player.name
+        }
     });
-
-    req.method = HttpRequestMethod.Post;
-    req.headers = [
-        new HttpHeader("Content-Type", "application/json")
-    ];
-    await http.request(req);
 });
 
-let chat = "a";
-let chat2 = "a";
 let chat3 = "a";
-let chatFirst = true;
-let chat2First = true;
 let chat3First = true;
-system.runInterval(async () => {
-    const res = await http.get("http://localhost:20005/");
-    if (res.body !== chat) {
-        chat = res.body;
-        if (chatFirst) {
-            chatFirst = false;
-            return;
-        };
-        const parseData = JSON.parse(res.body);
-        if (parseData.honyakuMessage) {
-            world.sendMessage(`${parseData.honyakuMessage}`);
-        };
-    };
-}, 10);
+// let chat = "a";
+// let chatFirst = true;
+// system.runInterval(async () => {
+//     const res = await http.get("http://localhost:20005");
+//     if (res.body !== chat) {
+//         chat = res.body;
+//         if (chatFirst) {
+//             chatFirst = false;
+//             return;
+//         };
+//         const parseData = JSON.parse(res.body);
+//         if (parseData.honyakuMessage) {
+//             world.sendMessage(`${parseData.honyakuMessage}`);
+//         };
+//     };
+// }, 10);
 
-system.runInterval(async () => {
-    const res = await http.get("http://localhost:20007/");
-    if (res.body !== chat2) {
-        chat2 = res.body;
-        if (chat2First) {
-            chat2First = false;
-            return;
-        };
-        const parseData = JSON.parse(res.body);
-        if (parseData.authorName) {
-            world.sendMessage(`§2 [§bDiscord-§r${parseData.authorName}§2] §r ${parseData.text}`);
-        }
+subscribeEvent();
+// レスポンスに合わせて処理
+async function subscribeEvent() {
+    const req = new HttpRequest("http://localhost:20005/event/receive");
+    req.timeout = 180;
+    req.method = HttpRequestMethod.Get;
+    const res = await http.request(req);
+    if (res.status == 502) {
+    } else if (res.status != 200) {
+    } else {
+        netEventHandler(res);
+    }
+    subscribeEvent();
+}
+
+function discordChatToMcChat(data) {
+    world.sendMessage(`§2 [§bDiscord-§r${data.authorName}§2] §r ${data.text}`);
+}
+
+function netEventHandler(res) {
+    const events = {
+        discord_chat: discordChatToMcChat
     };
-}, 10);
+    const eventList = JSON.parse(res.body);
+
+    for (const event of eventList) {
+        const type = event.type;
+        const data = event.data;
+        const handler = events[type];
+
+        if (handler) handler(data);
+    }
+}
+
+// vote通知
 system.runInterval(async () => {
     const res = await http.get("http://localhost:20004/");
     const votedata = DyProp.getDynamicProperty(`voteData`);
@@ -159,17 +195,17 @@ system.runInterval(async () => {
         if (parseData.username) {
             let parseVotedata = JSON.parse(votedata);
             world.sendMessage(`§l§6 [VOTE]\n §r§l${parseData.username} §l§aが §f${parseData.server} §aで投票しました`);
-            const req = new HttpRequest("http://localhost:20005/");
-            req.body = JSON.stringify({
-                username: parseData.username,
-                servername: parseData.server
+            await sendToDiscord({
+                channelId: mcChatChannelId,
+                content: {
+                    embeds: [
+                        {
+                            color: 0x0095d9,
+                            description: `Voted!!\n${parseData.username} が ${parseData.server} で投票しました`
+                        }
+                    ]
+                }
             });
-
-            req.method = HttpRequestMethod.Post;
-            req.headers = [
-                new HttpHeader("Content-Type", "application/json")
-            ];
-            await http.request(req);
             if (Object.keys(parseVotedata).includes(`${parseData.username}`)) return;
             Object.assign(parseVotedata, { [parseData.username]: false });
             StringifyAndSavePropertyData(`voteData`, parseVotedata);
@@ -247,20 +283,21 @@ world.afterEvents.entityDie.subscribe(async (ev) => {
     let reason = `Cause: ${damageSource.cause} `;
     if (damageSource?.damagingEntity) reason += `\nEntity: ${damageSource?.damagingEntity?.nameTag || damageSource?.damagingEntity?.typeId}`;
     if (damageSource?.damagingProjectile) reason += `\nProjectile: ${damageSource?.damagingProjectile?.nameTag || damageSource?.damagingProjectile?.typeId}`;
-    const req = new HttpRequest("http://localhost:20005/");
-    req.body = JSON.stringify({
-        deadPlayerName: player?.name,
-        reason: reason
+
+    sendToDiscord({
+        channelId: mcChatChannelId,
+        content: {
+            embeds: [
+                {
+                    color: 0x730099,
+                    description: `[Dead] ${player.name}\n${reason}`
+                }
+            ]
+        }
     });
-
-    req.method = HttpRequestMethod.Post;
-    req.headers = [
-        new HttpHeader("Content-Type", "application/json")
-    ];
-    await http.request(req);
-
 });
 
+// vote,login コマンド
 world.beforeEvents.chatSend.subscribe(event => {
     const { sender, message } = event;
     if (message === "?vote") {
@@ -314,46 +351,28 @@ world.afterEvents.entityDie.subscribe(async (ev) => {
     //if (!killLogCheckEntityIds.includes(`${deadEntity?.typeId}`)) return;
     try {
         const { x, y, z } = deadEntity.location;
-        const req = new HttpRequest("http://localhost:20005/");
-        req.body = JSON.stringify({
-            killLog: true,
-            killLogDamager: damageSource?.damagingEntity?.typeId,
-            killLogDamagerName: damageSource?.damagingEntity?.nameTag,
-            killLogDeader: deadEntity?.typeId,
-            killLogDeaderName: deadEntity?.nameTag,
-            killLogCause: damageSource?.cause,
-            killLogLocation: `${Math.floor(x)}_${Math.floor(y)}_${Math.floor(z)}_${deadEntity.dimension.id}`
-        });
 
-        req.method = HttpRequestMethod.Post;
-        req.headers = [
-            new HttpHeader("Content-Type", "application/json")
-        ];
-        await http.request(req);
-        return;
+        await sendToDiscord({
+            channelId: mcLogChannelId,
+            content: `\`\`\`[kill] \nDeaderType: ${deadEntity?.typeId}\nDeaderName: ${deadEntity?.nameTag}\nCause: ${damageSource?.cause}\nDamagerType: ${damageSource?.damagingEntity?.typeId}\nDamagerName: ${damageSource?.damagingEntity?.nameTag}\nLocation: ${Math.floor(x)}_${Math.floor(y)}_${Math.floor(z)}_${deadEntity.dimension.id}\`\`\``
+        });
     } catch (error) { };
 });
 
 world.afterEvents.playerPlaceBlock.subscribe(async (ev) => {
     const { player, block } = ev;
+
     const { x, y, z } = block.location;
+
     const chunkData = GetAndParsePropertyData(GetPlayerChunkPropertyId(player));
+
     //if(!chunkData) return;
     //if(!chunkData?.countryId) return;
-    const req = new HttpRequest("http://localhost:20005/");
-    req.body = JSON.stringify({
-        placeLog: true,
-        placeLogPlayer: player.name,
-        placeLogLocation: `${x}_${y}_${z}_${player.dimension.id}`,
-        placeLogBlockType: block?.typeId,
-    });
 
-    req.method = HttpRequestMethod.Post;
-    req.headers = [
-        new HttpHeader("Content-Type", "application/json")
-    ];
-    await http.request(req);
-    return;
+    await sendToDiscord({
+        channelId: mcLogChannelId,
+        content: `\`\`\`[place] \nPlayerName: ${player.name}\nBlock: ${block?.typeId}\nLocation: ${x}_${y}_${z}_${player.dimension.id}\`\`\``
+    });
 });
 
 world.afterEvents.playerBreakBlock.subscribe(async (ev) => {
@@ -361,19 +380,9 @@ world.afterEvents.playerBreakBlock.subscribe(async (ev) => {
     const { x, y, z } = block.location;
     const chunkData = GetAndParsePropertyData(GetPlayerChunkPropertyId(player));
     //if(!chunkData) return;
-    //if(!chunkData?.countryId) return;
-    const req = new HttpRequest("http://localhost:20005/");
-    req.body = JSON.stringify({
-        breakLog: true,
-        breakLogPlayer: player.name,
-        breakLogLocation: `${x}_${y}_${z}_${player.dimension.id}`,
-        breakLogBlockType: brokenBlockPermutation.type.id,
+    //if(!chunkData?.countryId) return;\
+    await sendToDiscord({
+        channelId: mcLogChannelId,
+        content: `\`\`\`[break] \nPlayerName: ${player.name}\nBlock: ${brokenBlockPermutation.type.id}\nLocation: ${x}_${y}_${z}_${player.dimension.id}\`\`\``
     });
-
-    req.method = HttpRequestMethod.Post;
-    req.headers = [
-        new HttpHeader("Content-Type", "application/json")
-    ];
-    await http.request(req);
-    return;
 });
