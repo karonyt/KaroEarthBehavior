@@ -1,5 +1,6 @@
 import { Player, system, world } from "@minecraft/server";
-import { GetAndParsePropertyData, GetPlayerChunkPropertyId } from "./util";
+import { GetAndParsePropertyData, GetPlayerChunkPropertyId, StringifyAndSavePropertyData } from "./util";
+import config from "../config";
 
 /**
  * 
@@ -31,9 +32,18 @@ export function invade(player) {
         return;
     };
     const date = new Date().getTime();
+    const cooltime = playerCountryData?.cooltime ?? date - 1000
+    if (cooltime - date > 0) {
+        player.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n` }, { translate: `invade.error.cooltime` , with: [`${Math.ceil((cooltime - date) / 100) / 10}`]}] });
+        return;
+    };
+
+    playerCountryData.cooltime = date + (config.invadeCooltime * 1000);
+    playerCountryData.
 
     //平和主義
     //モブ出す
     //クールタイム
     //切り替えれないように変更
+    StringifyAndSavePropertyData(`country_${playerCountryData.id}`,playerCountryData);
 };

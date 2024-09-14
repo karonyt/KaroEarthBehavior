@@ -75,5 +75,8 @@ export default {
     killValidity: true,
 
     //shopを有効にするか
-    shopValidity: true
+    shopValidity: true,
+
+    //侵略のクールタイム(秒)
+    invadeCooltime: 60 * 30
 };
