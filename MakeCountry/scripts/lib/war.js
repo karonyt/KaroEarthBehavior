@@ -51,9 +51,24 @@ export function invade(player) {
     //クールタイム
     //切り替えれないように変更
     const coreEntity = player.dimension.spawnEntity(`mc:core`, player.getHeadLocation());
+    warCountry.set(`${playerCountryData.id}`, { country: targetCountryData.id, core: coreEntity.id });
     coreEntity.nameTag = `${targetCountryData.name}§r Core`;
     let chunkmsg = GetPlayerChunkPropertyId(player).split(/(?<=^[^_]+?)_/)[1];
-    const msg = chunkmsg.replace(/_/g,` `);
-    world.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n` }, { translate: `invade.success`, with: [`${player.name}§r(${playerCountryData.name}§r)`, `${msg}§r(${playerCountryData.name}§r`] }] })
+    const msg = chunkmsg.replace(/_/g, ` `);
+    world.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n` }, { translate: `invade.success`, with: [`${player.name}§r(${playerCountryData.name}§r)`, `${msg}§r(${playerCountryData.name}§r`] }] });
     StringifyAndSavePropertyData(`country_${playerCountryData.id}`, playerCountryData);
 };
+
+world.afterEvents.entityLoad.subscribe((ev) => {
+    const entity = ev.entity;
+    if (entity?.typeId !== `mc:core`) return;
+    let isWar = false;
+    const core = warCountry.forEach((value, key, map) => {
+        if (entity.id == value.core) {
+            isWar = true;
+        };
+    });
+    if (!isWar) {
+        entity.remove();
+    };
+});
