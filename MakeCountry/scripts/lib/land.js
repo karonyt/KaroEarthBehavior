@@ -87,7 +87,7 @@ export function MakeCountry(owner, name = `country`, invite = true, peace = conf
         //加盟している国際組織
         internationalOrganizations: [],
         //戦争中
-        warNow: false,
+        isWarNow: false,
         //戦争中
         warNowCountries: [],
         //受け取った戦線布告の国
