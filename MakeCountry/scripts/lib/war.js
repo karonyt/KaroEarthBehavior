@@ -24,7 +24,7 @@ export function invade(player) {
         player.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n` }, { translate: `invade.error.peace` }] });
         return;
     };
-    if (playerCountryData?.isWarNow) {
+    if (warCountry.has(`${playerCountryData.id}`)) {
         player.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n` }, { translate: `invade.error.iswarnow` }] });
         return;
     };
@@ -70,5 +70,25 @@ world.afterEvents.entityLoad.subscribe((ev) => {
     });
     if (!isWar) {
         entity.remove();
+    };
+});
+
+world.afterEvents.playerSpawn.subscribe((ev) => {
+    const { initialSpawn, player } = ev;
+    if (initialSpawn) {
+        const tags = player.getTags().filter(a => a.startsWith(`war`));
+        for (let i = 0; i < tags.length; i++) {
+            player.removeTag(tags[i]);
+        };
+    };
+});
+
+world.afterEvents.worldInitialize.subscribe(() => {
+    const players = world.getPlayers();
+    for(const player of players) {
+        const tags = player.getTags().filter(a => a.startsWith(`war`));
+        for (let i = 0; i < tags.length; i++) {
+            player.removeTag(tags[i]);
+        };
     };
 });
