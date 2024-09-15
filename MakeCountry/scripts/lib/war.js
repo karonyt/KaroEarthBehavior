@@ -32,14 +32,14 @@ export function invade(player) {
         return;
     };
     const date = new Date().getTime();
-    const cooltime = playerCountryData?.cooltime ?? date - 1000
+    const cooltime = playerCountryData?.invadeCooltime ?? date - 1000;
     if (cooltime - date > 0) {
         player.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n` }, { translate: `invade.error.cooltime` , with: [`${Math.ceil((cooltime - date) / 100) / 10}`]}] });
         return;
     };
 
-    playerCountryData.cooltime = date + (config.invadeCooltime * 1000);
-    playerCountryData.
+    playerCountryData.invadeCooltime = date + (config.invadeCooltime * 1000);
+    playerCountryData.peaceChangeCooltime = 7;
 
     //平和主義
     //モブ出す
