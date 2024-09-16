@@ -24,6 +24,7 @@
         "value": 300,
         "max": 300
       },
+      "minecraft:knockback_resistance": 1000,
       "minecraft:boss": {
         "name": "コア",
         "hud_range": 20
