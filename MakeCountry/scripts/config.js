@@ -91,4 +91,7 @@ export default {
     //建国後の侵略ができない、されない期間
     invadeProtectionDuration: 7,
 
+    //隅からしか攻められないようにするか
+    isAttackCorner: true,
+
 };

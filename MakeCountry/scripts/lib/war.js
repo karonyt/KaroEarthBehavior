@@ -35,6 +35,10 @@ export function Invade(player) {
         player.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n` }, { translate: `invade.error.peace` }] });
         return;
     };
+    if (playerCountryData?.days <= config.invadeProtectionDuration) {
+        player.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n` }, { translate: `invade.error.protectionduration` }] });
+        return;
+    };
     if (warCountry.has(`${playerCountryData.id}`)) {
         player.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n` }, { translate: `invade.error.iswarnow` }] });
         return;
@@ -54,6 +58,33 @@ export function Invade(player) {
     if (cooltime - date > 0) {
         player.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n` }, { translate: `invade.error.cooltime`, with: [`${Math.ceil((cooltime - date) / 100) / 10}`] }] });
         return;
+    };
+    if (config.isAttackCorner) {
+        const thisChunk = chunk.id;
+        const [c, cx, cz, d] = thisChunk.split(`_`);
+        const numCx = Number(cx);
+        const numCz = Number(cz);
+        let adjacentTerritoriesLength = 0;
+        for (let i = -1; i <= 1; i += 2) {
+            const adjacentChunk = `${c}_${numCx}_${numCz + i}_${d}`;
+            const adjacentChunkData = GetAndParsePropertyData(`${adjacentChunk}`);
+            if (adjacentChunkData) {
+                if (adjacentChunkData?.countryId) {
+                    adjacentTerritoriesLength++;
+                };
+            };
+            const adjacentChunk2 = `${c}_${numCx + i}_${numCz}_${d}`;
+            const adjacentChunkData2 = GetAndParsePropertyData(`${adjacentChunk2}`);
+            if (adjacentChunkData2) {
+                if (adjacentChunkData2?.countryId) {
+                    adjacentTerritoriesLength++;
+                };
+            };
+        };
+        if(adjacentTerritoriesLength >= 3) {
+            player.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n` }, { translate: `invade.error.attackcorner` }] });
+            return;
+        };
     };
 
     playerCountryData.invadeCooltime = date + (config.invadeCooltime * 1000);
@@ -138,7 +169,7 @@ world.afterEvents.entityDie.subscribe((ev) => {
     StringifyAndSavePropertyData(chunkData.id, chunkData);
     StringifyAndSavePropertyData(`country_${playerCountryData.id}`, playerCountryData);
     StringifyAndSavePropertyData(`country_${invadeCountryData.id}`, invadeCountryData);
-    if(ev.damageSource?.damagingEntity) {
+    if (ev.damageSource?.damagingEntity) {
         ev.damageSource.damagingEntity.removeTag(ev.damageSource.damagingEntity.getTags().find(tag => tag.startsWith(`war`)));
     };
     wars.delete(data.key);
