@@ -1,4 +1,4 @@
-import { Container, DimensionType, DimensionTypes, EntityEquippableComponent, EquipmentSlot, MinecraftDimensionTypes, Player, system, world } from "@minecraft/server";
+import { Container, DimensionType, DimensionTypes, EffectType, EffectTypes, EntityEquippableComponent, EquipmentSlot, MinecraftDimensionTypes, Player, PotionEffectType, system, world } from "@minecraft/server";
 import { GetAndParsePropertyData, GetChunkPropertyId, GetPlayerChunkPropertyId, StringifyAndSavePropertyData } from "./util";
 import config from "../config";
 
@@ -287,3 +287,17 @@ system.runInterval(() => {
         };
     };
 }, 20);
+
+system.runInterval(() => {
+    for (const player of world.getPlayers()) {
+        const tags = player.getTags().filter(tag => tag.startsWith(`war`));
+        if (tags.length == 0) continue;
+        const container = player.getComponent(`inventory`).container;
+        const selectItem = container.getItem(player.selectedSlotIndex);
+        if (selectItem) {
+            const selectItemStackTypeId = selectItem.typeId;
+            if (selectItemStackTypeId != `minecraft:mace`) continue;
+            player.addEffect(`weakness`, 10, { amplifier: 250, showParticles: false });
+        };
+    };
+});
