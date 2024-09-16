@@ -50,10 +50,12 @@ export function Invade(player) {
     };
     const date = new Date().getTime();
     const cooltime = playerCountryData?.invadeCooltime ?? date - 1000;
+    /*
     if (cooltime - date > 0) {
         player.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n` }, { translate: `invade.error.cooltime`, with: [`${Math.ceil((cooltime - date) / 100) / 10}`] }] });
         return;
     };
+    */
 
     playerCountryData.invadeCooltime = date + (config.invadeCooltime * 1000);
     playerCountryData.peaceChangeCooltime = 7;
@@ -64,12 +66,12 @@ export function Invade(player) {
     const coreEntity = player.dimension.spawnEntity(`mc:core`, player.getHeadLocation());
     warCountry.set(`${playerCountryData.id}`, { country: targetCountryData.id, core: coreEntity.id, time: date + 1000 * 20 * 60, key: key });
     coreEntity.nameTag = `${targetCountryData.name}§r Core`;
-    let chunkmsg = GetPlayerChunkPropertyId(player).split(/(?<=^[^_]+?)_/)[1];
-    const msg = chunkmsg.replace(/_/g, ` `);
+    const { x, y, z } = coreEntity.location;
+    const msg = `${x}, ${y}, ${z} [${coreEntity.dimension.id.replace(`minecraft:`, ``)}`;
     player.addTag(`war${key}`);
     coreEntity.addTag(`war${key}`);
     wars.set(`${key}`, true);
-    world.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n` }, { translate: `invade.success`, with: [`${player.name}§r(${playerCountryData.name}§r)`, `${msg}§r(${playerCountryData.name}§r`] }] });
+    world.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n§f` }, { translate: `invade.success`, with: [`${player.name}§r(${playerCountryData.name}§r)`, `${msg}§r(${targetCountryData.name}§r`] }] });
     StringifyAndSavePropertyData(`country_${playerCountryData.id}`, playerCountryData);
 };
 
@@ -146,6 +148,7 @@ world.afterEvents.entityDie.subscribe((ev) => {
     StringifyAndSavePropertyData(chunkData.id, chunkData);
     StringifyAndSavePropertyData(`country_${playerCountryData.id}`, playerCountryData);
     StringifyAndSavePropertyData(`country_${invadeCountryData.id}`, invadeCountryData);
+    deadEntity.removeTag(deadEntity.getTags().find(tag => tag.startsWith(`war`)))
     warCountry.delete(key);
     world.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n` }, { translate: `invade.won`, with: [`§r${playerCountryData.name}§r`, `${invadeCountryData.name}§r`] }] });
 });
