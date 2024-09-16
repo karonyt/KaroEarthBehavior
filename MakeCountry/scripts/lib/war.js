@@ -4,11 +4,22 @@ import config from "../config";
 
 const warCountry = new Map();
 
+const wars = new Map();
 /**
  * 
  * @param {Player} player 
  */
 export function invade(player) {
+    let key = 0;
+    for (let i = 1; i < 16; i++) {
+        if (wars.has(`${i}`)) continue;
+        key = i;
+        break;
+    };
+    if (key == 0) {
+        player.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n` }, { translate: `invade.error.maxinvade` }] });
+        return;
+    };
     const chunk = GetAndParsePropertyData(GetPlayerChunkPropertyId(player));
     if (!chunk || !chunk?.countryId) {
         player.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n` }, { translate: `invade.error.wilderness` }] });
@@ -55,6 +66,8 @@ export function invade(player) {
     coreEntity.nameTag = `${targetCountryData.name}§r Core`;
     let chunkmsg = GetPlayerChunkPropertyId(player).split(/(?<=^[^_]+?)_/)[1];
     const msg = chunkmsg.replace(/_/g, ` `);
+    player.addTag(`war${key}`);
+    wars.set(`${key}`, true);
     world.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n` }, { translate: `invade.success`, with: [`${player.name}§r(${playerCountryData.name}§r)`, `${msg}§r(${playerCountryData.name}§r`] }] });
     StringifyAndSavePropertyData(`country_${playerCountryData.id}`, playerCountryData);
 };
@@ -85,7 +98,7 @@ world.afterEvents.playerSpawn.subscribe((ev) => {
 
 world.afterEvents.worldInitialize.subscribe(() => {
     const players = world.getPlayers();
-    for(const player of players) {
+    for (const player of players) {
         const tags = player.getTags().filter(a => a.startsWith(`war`));
         for (let i = 0; i < tags.length; i++) {
             player.removeTag(tags[i]);
@@ -95,9 +108,31 @@ world.afterEvents.worldInitialize.subscribe(() => {
 
 system.runInterval(() => {
     const players = world.getPlayers();
-    for(const player of players) {
+    for (const player of players) {
         const tags = player.getTags().filter(a => a.startsWith(`war`));
-        if(tags.length == 0) continue;
+        if (tags.length == 0) continue;
         player.isGliding = false;
     };
+});
+
+world.afterEvents.entityDie.subscribe((ev) => {
+    const { deadEntity } = ev;
+    if (deadEntity?.typeId !== `mc:core`) return;
+    let isWar = false;
+    let key = ``;
+    warCountry.forEach((value, mapKey, map) => {
+        if (deadEntity.id == value.core) {
+            isWar = true;
+            key = mapKey;
+        };
+    });
+    if (!isWar) {
+        return;
+    };
+    /**
+     * @type {{ country: number, core: string }}
+     */
+    const data = warCountry.get(key);
+    const playerCountry = Number(key);
+    const playerCountryData = GetAndParsePropertyData(`country_${playerCountry}`);
 });
