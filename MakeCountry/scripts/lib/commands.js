@@ -648,7 +648,7 @@ class ChatHandler {
     };
     invade() {
         if (!this.playerData?.country) {
-            this.sender.sendMessage({ translate: `command.invade.error.notjoin.country` });
+            this.sender.sendMessage({ translate: `command.sellchunk.error.notjoin.country` });
             return;
         };
         const cancel = CheckPermission(this.sender, `warAdmin`);
