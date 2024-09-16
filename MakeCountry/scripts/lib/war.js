@@ -1,4 +1,4 @@
-import { Container, EntityEquippableComponent, EquipmentSlot, Player, system, world } from "@minecraft/server";
+import { Container, DimensionType, DimensionTypes, EntityEquippableComponent, EquipmentSlot, MinecraftDimensionTypes, Player, system, world } from "@minecraft/server";
 import { GetAndParsePropertyData, GetChunkPropertyId, GetPlayerChunkPropertyId, StringifyAndSavePropertyData } from "./util";
 import config from "../config";
 
@@ -81,7 +81,7 @@ export function Invade(player) {
                 };
             };
         };
-        if(adjacentTerritoriesLength >= 3) {
+        if (adjacentTerritoriesLength >= 3) {
             player.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n` }, { translate: `invade.error.attackcorner` }] });
             return;
         };
@@ -134,6 +134,19 @@ world.afterEvents.worldInitialize.subscribe(() => {
             player.removeTag(tags[i]);
         };
     };
+    const overworldEntities = world.getDimension(`minecraft:overworld`).getEntities({ type: `mc:core` });
+    for (const entity of overworldEntities) {
+        entity.remove();
+    };
+    const netherEntities = world.getDimension(`minecraft:nether`).getEntities({ type: `mc:core` });
+    for (const entity of netherEntities) {
+        entity.remove();
+    };
+    const the_endEntities = world.getDimension(`minecraft:the_end`).getEntities({ type: `mc:core` });
+    for (const entity of the_endEntities) {
+        entity.remove();
+    };
+
 });
 
 world.afterEvents.entityDie.subscribe((ev) => {
