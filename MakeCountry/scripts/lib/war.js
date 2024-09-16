@@ -1,4 +1,4 @@
-import { Player, system, world } from "@minecraft/server";
+import { EntityEquippableComponent, EquipmentSlot, Player, system, world } from "@minecraft/server";
 import { GetAndParsePropertyData, GetChunkPropertyId, GetPlayerChunkPropertyId, StringifyAndSavePropertyData } from "./util";
 import config from "../config";
 
@@ -197,4 +197,35 @@ world.beforeEvents.playerLeave.subscribe((ev) => {
         wars.delete(key);
         world.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n` }, { translate: `invade.guard`, with: [`§r${warCountryData.name}§r`, `${playerCountryData.name}§r`] }] });
     });
+});
+
+world.afterEvents.entityDie.subscribe((ev) => {
+    if (!ev.deadEntity.isValid()) return;
+    if (ev.deadEntity.typeId != `minecraft:player`) return;
+    const playerData = GetAndParsePropertyData(`player_${ev.deadEntity.id}`);
+    const values = [];
+    for (const key of warCountry.keys()) {
+        const data = warCountry.get(key);
+        values.push(data.country);
+        if(data.country == playerData.country) break;
+    };
+    if (!values.includes(playerData.country) && !warCountry.has(`${playerData.country}`)) return;
+    /** 
+    * @type { Container } 
+    */
+    let playerContainer = ev.deadEntity.getComponent(`inventory`).container;
+    for (let i = 0; i < 36; i++) {
+        if (typeof playerContainer.getItem(i) === 'undefined') continue;
+        world.getDimension(ev.deadEntity.dimension.id).spawnItem(playerContainer.getItem(i), ev.deadEntity.location);
+    };
+    /** 
+    * @type { EntityEquippableComponent } 
+    */
+    let playerEquipment = ev.deadEntity.getComponent(`minecraft:equippable`);
+    const slotNames = ["Chest", "Head", "Feet", "Legs", "Offhand"];
+    for (let i = 0; i < 5; i++) {
+        if (typeof playerEquipment.getEquipment(slotNames[i]) === 'undefined') continue;
+        world.getDimension(ev.deadEntity.dimension.id).spawnItem(playerEquipment.getEquipment(slotNames[i]), ev.deadEntity.location);
+    };
+    ev.deadEntity.runCommandAsync(`clear @s`);
 });
