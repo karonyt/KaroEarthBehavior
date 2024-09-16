@@ -77,6 +77,15 @@ export default {
     //shopを有効にするか
     shopValidity: true,
 
+    //侵略(invade)を有効にするか
+    invadeValidity: true,
+    //侵略の制限時間(秒)
+    invadeTimelimit: 60 * 20,
+
     //侵略のクールタイム(秒)
-    invadeCooltime: 60 * 30
+    invadeCooltime: 60 * 30,
+
+    //侵略したあとの平和主義にできない期間
+    invadePeaceChangeCooltime: 7,
+
 };

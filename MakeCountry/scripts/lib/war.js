@@ -56,15 +56,14 @@ export function Invade(player) {
         return;
     };
 
-    //playerCountryData.invadeCooltime = date + (config.invadeCooltime * 1000);
-    playerCountryData.invadeCooltime = date + 1000 * 120;
-    playerCountryData.peaceChangeCooltime = 7;
+    playerCountryData.invadeCooltime = date + (config.invadeCooltime * 1000);
+    playerCountryData.peaceChangeCooltime = config.invadePeaceChangeCooltime;
     //平和主義
     //モブ出す
     //クールタイム
     //切り替えれないように変更
     const coreEntity = player.dimension.spawnEntity(`mc:core`, player.getHeadLocation());
-    warCountry.set(`${playerCountryData.id}`, { country: targetCountryData.id, core: coreEntity.id, time: date + 1000 * 20 * 60, key: key });
+    warCountry.set(`${playerCountryData.id}`, { country: targetCountryData.id, core: coreEntity.id, time: date + 1000 * config.invadeTimelimit, key: key });
     coreEntity.nameTag = `${targetCountryData.name}§r Core`;
     const { x, y, z } = coreEntity.location;
     const msg = `${Math.floor(x)}, ${Math.floor(y)}, ${Math.floor(z)} [${coreEntity.dimension.id.replace(`minecraft:`, ``)}]`;
