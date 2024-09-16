@@ -203,11 +203,12 @@ world.afterEvents.entityDie.subscribe((ev) => {
     if (!ev.deadEntity.isValid()) return;
     if (ev.deadEntity.typeId != `minecraft:player`) return;
     const playerData = GetAndParsePropertyData(`player_${ev.deadEntity.id}`);
+    if (!playerData?.country) return;
     const values = [];
     for (const key of warCountry.keys()) {
         const data = warCountry.get(key);
         values.push(data.country);
-        if(data.country == playerData.country) break;
+        if (data.country == playerData.country) break;
     };
     if (!values.includes(playerData.country) && !warCountry.has(`${playerData.country}`)) return;
     /** 
