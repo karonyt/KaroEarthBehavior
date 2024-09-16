@@ -67,6 +67,7 @@ export function Invade(player) {
     let chunkmsg = GetPlayerChunkPropertyId(player).split(/(?<=^[^_]+?)_/)[1];
     const msg = chunkmsg.replace(/_/g, ` `);
     player.addTag(`war${key}`);
+    coreEntity.addTag(`war${key}`);
     wars.set(`${key}`, true);
     world.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n` }, { translate: `invade.success`, with: [`${player.name}§r(${playerCountryData.name}§r)`, `${msg}§r(${playerCountryData.name}§r`] }] });
     StringifyAndSavePropertyData(`country_${playerCountryData.id}`, playerCountryData);

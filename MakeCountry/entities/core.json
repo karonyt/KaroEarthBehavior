@@ -353,7 +353,7 @@
                     "test": "has_damage",
                     "subject": "self",
                     "operator": "!=",
-                    "value": "entity_attack"
+                    "value": "attack"
                   }
                 ]
               }
