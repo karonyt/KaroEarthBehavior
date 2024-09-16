@@ -146,7 +146,6 @@ world.afterEvents.worldInitialize.subscribe(() => {
     for (const entity of the_endEntities) {
         entity.remove();
     };
-
 });
 
 world.afterEvents.entityDie.subscribe((ev) => {
