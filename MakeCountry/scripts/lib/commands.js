@@ -511,6 +511,7 @@ class ChatHandler {
         { translate: `command.help.tpa` }, { text: `\n` },
         { translate: `command.help.camera` }, { text: `\n` },
         { translate: `command.help.map` }, { text: `\n` },
+        { translate: `command.help.invade` }, { text: `\n` },
         { text: `§btp §a:世界各地へテレポートするメニューを表示します\n` },
         { text: `§blobby §a:ロビーにテレポートします\n` },
         { text: `§bvote §a:投票の報酬を受け取ります\n` },
@@ -649,6 +650,10 @@ class ChatHandler {
         return;
     };
     invade() {
+        if (!config.invadeValidity) {
+            this.sender.sendMessage({ translate: `command.error.invade.novalidity` });
+            return;
+        };
         if (!this.playerData?.country) {
             this.sender.sendMessage({ translate: `command.sellchunk.error.notjoin.country` });
             return;
