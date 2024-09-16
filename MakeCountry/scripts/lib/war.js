@@ -63,7 +63,7 @@ world.afterEvents.entityLoad.subscribe((ev) => {
     const entity = ev.entity;
     if (entity?.typeId !== `mc:core`) return;
     let isWar = false;
-    const core = warCountry.forEach((value, key, map) => {
+    warCountry.forEach((value, key, map) => {
         if (entity.id == value.core) {
             isWar = true;
         };
@@ -90,5 +90,14 @@ world.afterEvents.worldInitialize.subscribe(() => {
         for (let i = 0; i < tags.length; i++) {
             player.removeTag(tags[i]);
         };
+    };
+});
+
+system.runInterval(() => {
+    const players = world.getPlayers();
+    for(const player of players) {
+        const tags = player.getTags().filter(a => a.startsWith(`war`));
+        if(tags.length == 0) continue;
+        player.isGliding = false;
     };
 });
