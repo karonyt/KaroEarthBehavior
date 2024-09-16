@@ -1,4 +1,4 @@
-import { EntityEquippableComponent, EquipmentSlot, Player, system, world } from "@minecraft/server";
+import { Container, EntityEquippableComponent, EquipmentSlot, Player, system, world } from "@minecraft/server";
 import { GetAndParsePropertyData, GetChunkPropertyId, GetPlayerChunkPropertyId, StringifyAndSavePropertyData } from "./util";
 import config from "../config";
 
