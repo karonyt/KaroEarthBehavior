@@ -21,7 +21,7 @@ export default {
     //デフォルトのチャンクの値段
     defaultChunkPrice: 2000,
     //国際組織の設立にかかる金
-    MakeInternationalOrganizationCost: 100000,
+    MakeInternationalOrganizationCost: 10000,
     //共通通貨の単位
     MoneyName: `$`,
     //初期の国庫の金
@@ -81,16 +81,12 @@ export default {
     invadeValidity: true,
     //侵略の制限時間(秒)
     invadeTimelimit: 60 * 20,
-
     //侵略のクールタイム(秒)
     invadeCooltime: 60 * 30,
-
     //侵略したあとの平和主義にできない期間
     invadePeaceChangeCooltime: 7,
-
     //建国後の侵略ができない、されない期間
     invadeProtectionDuration: 7,
-
     //隅からしか攻められないようにするか
     isAttackCorner: true,
 

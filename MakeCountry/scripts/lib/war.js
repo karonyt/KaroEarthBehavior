@@ -89,10 +89,7 @@ export function Invade(player) {
 
     playerCountryData.invadeCooltime = date + (config.invadeCooltime * 1000);
     playerCountryData.peaceChangeCooltime = config.invadePeaceChangeCooltime;
-    //平和主義
-    //モブ出す
-    //クールタイム
-    //切り替えれないように変更
+
     const coreEntity = player.dimension.spawnEntity(`mc:core`, player.getHeadLocation());
     warCountry.set(`${playerCountryData.id}`, { country: targetCountryData.id, core: coreEntity.id, time: date + 1000 * config.invadeTimelimit, key: key });
     coreEntity.nameTag = `${targetCountryData.name}§r Core`;
