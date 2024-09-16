@@ -117,6 +117,7 @@ system.runInterval(() => {
 
 world.afterEvents.entityDie.subscribe((ev) => {
     const { deadEntity } = ev;
+    if (!deadEntity.isValid()) return;
     if (deadEntity?.typeId !== `mc:core`) return;
     let isWar = false;
     let key = ``;
@@ -133,6 +134,67 @@ world.afterEvents.entityDie.subscribe((ev) => {
      * @type {{ country: number, core: string }}
      */
     const data = warCountry.get(key);
-    const playerCountry = Number(key);
-    const playerCountryData = GetAndParsePropertyData(`country_${playerCountry}`);
+    const playerCountryData = GetAndParsePropertyData(`country_${key}`);
+    const invadeCountryData = GetAndParsePropertyData(`country_${data.country}`);
+    const chunkData = GetAndParsePropertyData(GetPlayerChunkPropertyId(deadEntity));
+    chunkData.countryId = playerCountryData.id;
+    if (invadeCountryData.territories.includes(chunkData.id)) {
+        invadeCountryData.territories.splice(playerCountryData.territories.indexOf(chunkData.id), 1);
+    };
+    playerCountryData.territories.push(chunkData.id);
+    StringifyAndSavePropertyData(chunkData.id, chunkData);
+    StringifyAndSavePropertyData(`country_${playerCountryData.id}`, playerCountryData);
+    StringifyAndSavePropertyData(`country_${invadeCountryData.id}`, invadeCountryData);
+    warCountry.delete(key);
+    world.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n` }, { translate: `invade.won`, with: [`§r${playerCountryData.name}§r`, `${invadeCountryData.name}§r`] }] });
+});
+
+world.afterEvents.entityDie.subscribe((ev) => {
+    const { deadEntity } = ev;
+    if (!deadEntity.isValid()) return;
+    if (deadEntity?.typeId !== `minecraft:player`) return;
+    const tags = deadEntity.getTags().find(a => a.startsWith(`war`));
+    if (!tags) return;
+    const key = tags.split(`war`)[1];
+    const playerData = GetAndParsePropertyData(`player_${deadEntity.id}`);
+    if (!warCountry.has(`${playerData.country}`)) return;
+    /**
+     * @type {{ country: number, core: string }}
+     */
+    const warData = warCountry.get(`${playerData.country}`);
+    const playerCountryData = GetAndParsePropertyData(`country_${playerData.country}`);
+    const warCountryData = GetAndParsePropertyData(`country_${warData.country}`);
+    const core = world.getEntity(warData.core);
+    if (core) {
+        core.remove();
+    };
+    deadEntity.removeTag(`war${key}`);
+    wars.delete(key);
+    world.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n` }, { translate: `invade.guard`, with: [`§r${warCountryData.name}§r`, `${playerCountryData.name}§r`] }] });
+});
+
+world.beforeEvents.playerLeave.subscribe((ev) => {
+    const { player: deadEntity } = ev;
+    if (!deadEntity.isValid()) return;
+    if (deadEntity?.typeId !== `minecraft:player`) return;
+    const tags = deadEntity.getTags().find(a => a.startsWith(`war`));
+    if (!tags) return;
+    const id = deadEntity.id;
+    system.run(() => {
+        const key = tags.split(`war`)[1];
+        const playerData = GetAndParsePropertyData(`player_${id}`);
+        if (!warCountry.has(`${playerData.country}`)) return;
+        /**
+         * @type {{ country: number, core: string }}
+         */
+        const warData = warCountry.get(`${playerData.country}`);
+        const playerCountryData = GetAndParsePropertyData(`country_${playerData.country}`);
+        const warCountryData = GetAndParsePropertyData(`country_${warData.country}`);
+        const core = world.getEntity(warData.core);
+        if (core) {
+            core.remove();
+        };
+        wars.delete(key);
+        world.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n` }, { translate: `invade.guard`, with: [`§r${warCountryData.name}§r`, `${playerCountryData.name}§r`] }] });
+    });
 });
