@@ -67,11 +67,11 @@ export function Invade(player) {
     warCountry.set(`${playerCountryData.id}`, { country: targetCountryData.id, core: coreEntity.id, time: date + 1000 * 20 * 60, key: key });
     coreEntity.nameTag = `${targetCountryData.name}§r Core`;
     const { x, y, z } = coreEntity.location;
-    const msg = `${x}, ${y}, ${z} [${coreEntity.dimension.id.replace(`minecraft:`, ``)}`;
+    const msg = `${Math.floor(x)}, ${Math.floor(y)}, ${Math.floor(z)} [${coreEntity.dimension.id.replace(`minecraft:`, ``)}]`;
     player.addTag(`war${key}`);
     coreEntity.addTag(`war${key}`);
     wars.set(`${key}`, true);
-    world.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n§f` }, { translate: `invade.success`, with: [`${player.name}§r(${playerCountryData.name}§r)`, `${msg}§r(${targetCountryData.name}§r`] }] });
+    world.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n§f` }, { translate: `invade.success`, with: [`${player.name}§r(${playerCountryData.name}§r)`, `${msg}§r(${targetCountryData.name})§r`] }] });
     StringifyAndSavePropertyData(`country_${playerCountryData.id}`, playerCountryData);
 };
 
@@ -139,7 +139,10 @@ world.afterEvents.entityDie.subscribe((ev) => {
     StringifyAndSavePropertyData(chunkData.id, chunkData);
     StringifyAndSavePropertyData(`country_${playerCountryData.id}`, playerCountryData);
     StringifyAndSavePropertyData(`country_${invadeCountryData.id}`, invadeCountryData);
-    deadEntity.removeTag(deadEntity.getTags().find(tag => tag.startsWith(`war`)))
+    if(ev.damageSource?.damagingEntity) {
+        ev.damageSource.damagingEntity.removeTag(ev.damageSource.damagingEntity.getTags().find(tag => tag.startsWith(`war`)));
+    };
+    wars.delete(data.key);
     warCountry.delete(key);
     world.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n` }, { translate: `invade.won`, with: [`§r${playerCountryData.name}§r`, `${invadeCountryData.name}§r`] }] });
 });

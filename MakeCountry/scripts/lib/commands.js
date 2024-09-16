@@ -325,11 +325,13 @@ class ChatHandler {
         if (chunkData) {
             if (chunkData?.countryId) {
                 const countryData = GetAndParsePropertyData(`country_${chunkData?.countryId}`);
-                countryData.territories.splice(countryData.territories.indexOf(chunkId), 1);
-                let chunkPrice = config.defaultChunkPrice / 2;
-                if (chunkData && chunkData.price) chunkPrice = chunkData.price / 2;
-                countryData.money += chunkPrice;
-                StringifyAndSavePropertyData(`country_${chunkData?.countryId}`, countryData);
+                if(countryData) {
+                    countryData.territories.splice(countryData.territories.indexOf(chunkId), 1);
+                    let chunkPrice = config.defaultChunkPrice / 2;
+                    if (chunkData && chunkData.price) chunkPrice = chunkData.price / 2;
+                    countryData.money += chunkPrice;
+                    StringifyAndSavePropertyData(`country_${chunkData?.countryId}`, countryData);    
+                };
             };
         };
         DyProp.setDynamicProperty(chunkId);
