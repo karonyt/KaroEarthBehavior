@@ -21,8 +21,8 @@
       },
       "minecraft:nameable": {},
       "minecraft:health": {
-        "value": 300,
-        "max": 300
+        "value": 600,
+        "max": 600
       },
       "minecraft:knockback_resistance": 1000,
       "minecraft:boss": {

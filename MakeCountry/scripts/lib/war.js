@@ -50,14 +50,14 @@ export function Invade(player) {
     };
     const date = new Date().getTime();
     const cooltime = playerCountryData?.invadeCooltime ?? date - 1000;
-    /*
+
     if (cooltime - date > 0) {
         player.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n` }, { translate: `invade.error.cooltime`, with: [`${Math.ceil((cooltime - date) / 100) / 10}`] }] });
         return;
     };
-    */
 
-    playerCountryData.invadeCooltime = date + (config.invadeCooltime * 1000);
+    //playerCountryData.invadeCooltime = date + (config.invadeCooltime * 1000);
+    playerCountryData.invadeCooltime = date + 1000 * 120;
     playerCountryData.peaceChangeCooltime = 7;
     //平和主義
     //モブ出す
@@ -168,6 +168,7 @@ world.afterEvents.entityDie.subscribe((ev) => {
     };
     deadEntity.removeTag(`war${key}`);
     wars.delete(key);
+    warCountry.delete(`${playerData.country}`);
     world.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n` }, { translate: `invade.guard`, with: [`§r${warCountryData.name}§r`, `${playerCountryData.name}§r`] }] });
 });
 
@@ -193,6 +194,7 @@ world.beforeEvents.playerLeave.subscribe((ev) => {
             core.remove();
         };
         wars.delete(key);
+        warCountry.delete(`${playerData.country}`);
         world.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n` }, { translate: `invade.guard`, with: [`§r${warCountryData.name}§r`, `${playerCountryData.name}§r`] }] });
     });
 });
