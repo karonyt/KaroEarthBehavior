@@ -109,15 +109,6 @@ world.afterEvents.worldInitialize.subscribe(() => {
     };
 });
 
-system.runInterval(() => {
-    const players = world.getPlayers();
-    for (const player of players) {
-        const tags = player.getTags().filter(a => a.startsWith(`war`));
-        if (tags.length == 0) continue;
-        player.isGliding = false;
-    };
-});
-
 world.afterEvents.entityDie.subscribe((ev) => {
     const { deadEntity } = ev;
     if (!deadEntity.isValid()) return;
