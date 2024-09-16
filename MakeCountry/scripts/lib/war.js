@@ -1,4 +1,4 @@
-import { Container, DimensionType, DimensionTypes, EffectType, EffectTypes, EntityEquippableComponent, EquipmentSlot, MinecraftDimensionTypes, Player, PotionEffectType, system, world } from "@minecraft/server";
+import { Container, EntityEquippableComponent, Player, system, world } from "@minecraft/server";
 import { GetAndParsePropertyData, GetChunkPropertyId, GetPlayerChunkPropertyId, StringifyAndSavePropertyData } from "./util";
 import config from "../config";
 
