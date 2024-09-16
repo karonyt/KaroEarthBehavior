@@ -10,6 +10,7 @@ import { PlayerMarketMainMenu } from "./player_market";
 import { tpaMainForm } from "./tpa";
 import { ShopCommonsMenu } from "./shop";
 import { sendEvent } from "./server_net";
+import { Invade } from "./war";
 
 
 class ChatHandler {
@@ -171,6 +172,9 @@ class ChatHandler {
                     break;
                 case "map":
                     this.map();
+                    break;
+                case "invade":
+                    this.invade();
                     break;
                 default:
                     this.sender.sendMessage({ translate: `command.unknown.error`, with: [commandName] });
@@ -640,6 +644,19 @@ class ChatHandler {
             result.push(jResult.join(``));
         };
         this.sender.sendMessage(`§c----------------------------------------------------\n${result.join(`\n`)}\n§c----------------------------------------------------`);
+        return;
+    };
+    invade() {
+        if (!this.playerData?.country) {
+            this.sender.sendMessage({ translate: `command.invade.error.notjoin.country` });
+            return;
+        };
+        const cancel = CheckPermission(this.sender, `warAdmin`);
+        if (cancel) {
+            this.sender.sendMessage({ translate: `command.error.permission` });
+            return;
+        };
+        Invade(this.sender);
         return;
     };
 };

@@ -9,7 +9,7 @@ const wars = new Map();
  * 
  * @param {Player} player 
  */
-export function invade(player) {
+export function Invade(player) {
     let key = 0;
     for (let i = 1; i < 16; i++) {
         if (wars.has(`${i}`)) continue;
@@ -62,7 +62,7 @@ export function invade(player) {
     //クールタイム
     //切り替えれないように変更
     const coreEntity = player.dimension.spawnEntity(`mc:core`, player.getHeadLocation());
-    warCountry.set(`${playerCountryData.id}`, { country: targetCountryData.id, core: coreEntity.id });
+    warCountry.set(`${playerCountryData.id}`, { country: targetCountryData.id, core: coreEntity.id, time: date + 1000 * 20 * 60, key: key });
     coreEntity.nameTag = `${targetCountryData.name}§r Core`;
     let chunkmsg = GetPlayerChunkPropertyId(player).split(/(?<=^[^_]+?)_/)[1];
     const msg = chunkmsg.replace(/_/g, ` `);
@@ -230,3 +230,21 @@ world.afterEvents.entityDie.subscribe((ev) => {
     };
     ev.deadEntity.runCommandAsync(`clear @s`);
 });
+
+system.runInterval(() => {
+    const date = new Date().getTime();
+    for (const key of warCountry.keys()) {
+        const data = warCountry.get(key);
+        if (data.time < date) {
+            warCountry.delete(key);
+            wars.delete(`${data.key}`);
+            const playerCountryData = GetAndParsePropertyData(`country_${key}`);
+            const warCountryData = GetAndParsePropertyData(`country_${data.country}`);
+            const core = world.getEntity(data.core);
+            if (core) {
+                core.remove();
+            };
+            world.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n` }, { translate: `invade.guard`, with: [`§r${warCountryData.name}§r`, `${playerCountryData.name}§r`] }] });
+        };
+    };
+}, 20);
