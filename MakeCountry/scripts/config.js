@@ -88,4 +88,7 @@ export default {
     //侵略したあとの平和主義にできない期間
     invadePeaceChangeCooltime: 7,
 
+    //建国後の侵略ができない、されない期間
+    invadeProtectionDuration: 7,
+
 };
