@@ -28,24 +28,37 @@ export default {
     initialCountryMoney: 0,
     //初期のリソースポイント
     initialCountryResourcePoint: 0,
-    //徴税間隔(分)
+
+
+    //徴税＆維持費回収を有効化
+    taxValidity: true,
+    //徴税＆維持費回収を時間指定制にするか(falseの場合 時間間隔制になる)
+    //24時間サーバーの場合は時間指定制がおすすめです
+    //ローカルワールドの場合は時間間隔制がおすすめです
+    taxTypeIsTimeSet: true,
+    //徴税時間(時間指定制の場合)
+    taxTime: { hour: 21, min: 0 },
+    //徴税間隔(分) (時間間隔制の場合)
     taxTimer: 2 * 60,
+    //徴税の何分前にメッセージを表示するか
+    taxMessageBeforeTime: 10,
     //初期設定で税金をパーセント式にするか(falseの場合,定額制)
     taxInstitutionIsPer: true,
     //初期の税率(税額)
     taxPer: 10,
+    //建国後何回分の徴税をなしにするか
+    NonMaintenanceCostAccrualPeriod: 3,
+    //平和主義国の維持費(1チャンク)
+    MaintenanceFeePacifistCountries: 50,
+    //非平和主義国の維持費(1チャンク)
+    MaintenanceFeeNonPeacefulCountries: 5,
+
     //建国時に国庫を非公開にするか
     hideCountryMoney: true,
     //特別区域で許可する権限
     specialAllowPermissions: [`entityUse`, `blockUse`, `setHome`, `openContainer`],
     //荒野で許可する権限
     wildernessAllowPermissions: [`entityUse`, `blockUse`, `makeCountry`, `buyChunk`, `place`, `break`, `setHome`, `openContainer`],
-    //平和主義国の維持費(1チャンク)
-    MaintenanceFeePacifistCountries: 50,
-    //非平和主義国の維持費(1チャンク)
-    MaintenanceFeeNonPeacefulCountries: 5,
-    //建国後何回分の徴税をなしにするか
-    NonMaintenanceCostAccrualPeriod: 3,
     //1ヵ国におけるロールの最大数(デフォルトのロールも考慮) (3以上)
     maxRoleAmount: 15,
 

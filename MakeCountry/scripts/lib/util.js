@@ -362,3 +362,23 @@ export function isWithinTimeRange(startTime, endTime) {
         return currentTime >= startMinutes || currentTime <= endMinutes;
     };
 };
+
+export function getTimeBefore(time, minutesBefore) {
+    // 与えられた時間と分から、合計分を計算
+    let totalMinutes = time.hour * 60 + time.min;
+
+    // 指定された時間よりも前に戻す
+    totalMinutes -= minutesBefore;
+
+    // 時間が0よりも小さい場合、日付を巻き戻す
+    if (totalMinutes < 0) {
+        totalMinutes += 24 * 60; // 24時間分の分数を加算
+    };
+
+    // 時間と分に変換し直す
+    const newHour = Math.floor(totalMinutes / 60);
+    const newMin = totalMinutes % 60;
+
+    // 新しい時間を返す
+    return { hour: newHour, min: newMin };
+};
