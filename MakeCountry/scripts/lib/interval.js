@@ -121,6 +121,7 @@ function tax() {
 };
 
 system.runInterval(() => {
+    const zikan = new Date();
     if (zikan.getHours() == 0 && zikan.getMinutes() == 0) {
         DyProp.setDynamicProperty(`voteData`, `{}`);
         DyProp.setDynamicProperty(`loginData`, `{}`);
