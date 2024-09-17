@@ -62,6 +62,7 @@ world.beforeEvents.playerPlaceBlock.subscribe((ev) => {
 });
 
 world.beforeEvents.itemUseOn.subscribe((ev) => {
+    if(!ev.isFirstEvent) return;
     const permission = `place`
     const { source: player, block } = ev;
     const { x, z } = block.location;
@@ -73,6 +74,7 @@ world.beforeEvents.itemUseOn.subscribe((ev) => {
 });
 
 world.beforeEvents.playerInteractWithBlock.subscribe((ev) => {
+    if(!ev.isFirstEvent) return;
     const permission2 = 'openContainer'; // コンテナの開放権限
     const permission = 'blockUse'; // ブロックの使用権限
     const { player, block } = ev;
