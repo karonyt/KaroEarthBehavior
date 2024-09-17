@@ -50,14 +50,14 @@ system.runInterval(() => {
         world.setDynamicProperty(`taxTimer`, `${taxTimer}`);
         taxTimerString = `${taxTimer}`;
         if (taxTimer == config.taxMessageBeforeTime) {
-            world.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n§r` }, { translate: `tax.before.message1`, with: [`${config.taxMessageBeforeTime}`] }, { text: `\n` }, { translate: `tax.before.message2`, with: [`${config.NonMaintenanceCostAccrualPeriod}`] }, { text: `\n` }, { translate: `tax.before.message3`, with: [`${config.MaintenanceFeePacifistCountries}`] }, { text: `\n` }, {translate: `tax.before.message4`, with: [`${config.MaintenanceFeeNonPeacefulCountries}`]},{text: `\n`},{translate: `tax.before.message5` }] });
-return;
+            world.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n§r` }, { translate: `tax.before.message1`, with: [`${config.taxMessageBeforeTime}`] }, { text: `\n` }, { translate: `tax.before.message2`, with: [`${config.NonMaintenanceCostAccrualPeriod}`] }, { text: `\n` }, { translate: `tax.before.message3`, with: [`${config.MaintenanceFeePacifistCountries}`] }, { text: `\n` }, { translate: `tax.before.message4`, with: [`${config.MaintenanceFeeNonPeacefulCountries}`] }, { text: `\n` }, { translate: `tax.before.message5` }] });
+            return;
         };
-if (taxTimer <= 0) {
-    world.setDynamicProperty(`taxTimer`, `${config.taxTimer}`);
-    taxTimerString = `${config.taxTimer}`;
-    tax();
-};
+        if (taxTimer <= 0) {
+            world.setDynamicProperty(`taxTimer`, `${config.taxTimer}`);
+            taxTimerString = `${config.taxTimer}`;
+            tax();
+        };
     };
 }, 20 * 60);
 
