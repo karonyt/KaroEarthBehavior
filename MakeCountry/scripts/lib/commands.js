@@ -176,6 +176,9 @@ class ChatHandler {
                 case "invade":
                     this.invade();
                     break;
+                case "cr":
+                    this.copyright();
+                    break;
                 default:
                     this.sender.sendMessage({ translate: `command.unknown.error`, with: [commandName] });
                     break;
@@ -325,12 +328,12 @@ class ChatHandler {
         if (chunkData) {
             if (chunkData?.countryId) {
                 const countryData = GetAndParsePropertyData(`country_${chunkData?.countryId}`);
-                if(countryData) {
+                if (countryData) {
                     countryData.territories.splice(countryData.territories.indexOf(chunkId), 1);
                     let chunkPrice = config.defaultChunkPrice / 2;
                     if (chunkData && chunkData.price) chunkPrice = chunkData.price / 2;
                     countryData.money += chunkPrice;
-                    StringifyAndSavePropertyData(`country_${chunkData?.countryId}`, countryData);    
+                    StringifyAndSavePropertyData(`country_${chunkData?.countryId}`, countryData);
                 };
             };
         };
@@ -512,6 +515,7 @@ class ChatHandler {
         { translate: `command.help.camera` }, { text: `\n` },
         { translate: `command.help.map` }, { text: `\n` },
         { translate: `command.help.invade` }, { text: `\n` },
+        { translate: `command.help.copyright` }, { text: `\n` },
         { text: `§btp §a:世界各地へテレポートするメニューを表示します\n` },
         { text: `§blobby §a:ロビーにテレポートします\n` },
         { text: `§bvote §a:投票の報酬を受け取ります\n` },
@@ -664,6 +668,25 @@ class ChatHandler {
             return;
         };
         Invade(this.sender);
+        return;
+    };
+    copyright() {
+        const container = this.sender.getComponent(`inventory`).container;
+        const item = container.getItem(this.sender.selectedSlotIndex);
+        if (item) {
+            const loreArray = item.getLore();
+            if (loreArray.includes(`§c§r§d${this.sender.name}(${this.sender.id})`)) {
+                item.setLore(loreArray.splice(loreArray.indexOf(`§c§r§d${this.sender.name}(${this.sender.id})`), 1));
+                container.setItem(this.sender.selectedSlotIndex);
+                return;
+            };
+            if (loreArray[0].startsWith(`§c§r§d`)) {
+                return;
+            };
+            loreArray.unshift(`§c§r§d${this.sender.name}(${this.sender.id})`);
+            item.setLore(loreArray);
+            container.setItem(this.sender.selectedSlotIndex);
+        };
         return;
     };
 };
