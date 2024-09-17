@@ -1,5 +1,5 @@
 import { Container, EntityEquippableComponent, Player, system, world } from "@minecraft/server";
-import { GetAndParsePropertyData, GetChunkPropertyId, GetPlayerChunkPropertyId, StringifyAndSavePropertyData } from "./util";
+import { GetAndParsePropertyData, GetChunkPropertyId, GetPlayerChunkPropertyId, isWithinTimeRange, StringifyAndSavePropertyData } from "./util";
 import config from "../config";
 
 const warCountry = new Map();
@@ -19,6 +19,14 @@ export function Invade(player) {
     if (key == 0) {
         player.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n` }, { translate: `invade.error.maxinvade` }] });
         return;
+    };
+    if (config.isSettingCanInvadeDuration) {
+        let start = config.canInvadeDuration.startTime;
+        let end = config.canInvadeDuration.endTime;
+        if (isWithinTimeRange(start, end)) {
+            player.sendMessage({ rawtext: [{ text: `§a[MakeCountry]\n` }, { translate: `invade.error.notimerange` , with: [`${start.hour}:${start.min}～${end.hour}:${end.min}`]}] });
+            return;
+        };
     };
     const chunk = GetAndParsePropertyData(GetPlayerChunkPropertyId(player));
     if (!chunk || !chunk?.countryId) {

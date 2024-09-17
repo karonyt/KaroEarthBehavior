@@ -345,3 +345,20 @@ export function isDecimalNumber(value) {
     const integerRegex = /^[1-9]\d*$/;
     return integerRegex.test(value);
 };
+
+export function isWithinTimeRange(startTime, endTime) {
+    const date = new Date();
+    const currentHour = date.getHours();
+    const currentMinute = date.getMinutes();
+    const currentTime = currentHour * 60 + currentMinute;
+    const startMinutes = startTime.hour * 60 + startTime.min;
+    const endMinutes = endTime.hour * 60 + endTime.min;
+
+    if (startMinutes <= endMinutes) {
+        // 同じ日内の範囲
+        return currentTime >= startMinutes && currentTime <= endMinutes;
+    } else {
+        // 日付をまたぐ範囲
+        return currentTime >= startMinutes || currentTime <= endMinutes;
+    };
+};

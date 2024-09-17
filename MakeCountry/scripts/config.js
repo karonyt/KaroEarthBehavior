@@ -89,5 +89,13 @@ export default {
     invadeProtectionDuration: 7,
     //隅からしか攻められないようにするか
     isAttackCorner: true,
-
+    //指定した時間帯でないと戦争をできないようにするか
+    isSettingCanInvadeDuration: true,
+    //戦争が可能な時間帯
+    canInvadeDuration: {
+        //期間開始時刻(24時間制)
+        startTime: { hour: 18, min: 0 },
+        //期間終了時刻(24時間制)
+        endTime: { hour: 23, min: 0 }
+    }
 };
