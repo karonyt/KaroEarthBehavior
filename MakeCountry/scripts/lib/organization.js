@@ -30,7 +30,7 @@ export function createorganization(player, organizationName) {
     const organizationData = {
         name: organizationName,
         id: organizationId,
-        country: playerData?.country,
+        owner: playerData?.country,
         signatory: [playerData?.country],
         money: 0,
     };
