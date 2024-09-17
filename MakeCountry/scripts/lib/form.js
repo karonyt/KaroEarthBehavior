@@ -2,7 +2,7 @@ import { Player, system, world } from "@minecraft/server";
 import * as DyProp from "./DyProp";
 import { ActionFormData, FormCancelationReason, ModalFormData } from "@minecraft/server-ui";
 import config from "../config";
-import { acceptApplicationRequest, AddAlliance, AddHostilityByPlayer, CreateRoleToCountry, DeleteCountry, DeleteRole, denyAllianceRequest, denyApplicationRequest, MakeCountry, playerChangeOwner, playerCountryInvite, playerCountryJoin, playerCountryKick, RemoveAlliance, sendAllianceRequest, sendApplicationForPeace } from "./land";
+import { acceptAlliance, acceptApplicationRequest, AddHostilityByPlayer, CreateRoleToCountry, DeleteCountry, DeleteRole, denyAllianceRequest, denyApplicationRequest, MakeCountry, playerChangeOwner, playerCountryInvite, playerCountryJoin, playerCountryKick, RemoveAlliance, sendAllianceRequest, sendApplicationForPeace } from "./land";
 import { CheckPermission, CheckPermissionFromLocation, GetAndParsePropertyData, GetPlayerChunkPropertyId, isDecimalNumber, StringifyAndSavePropertyData } from "./util";
 
 /**
@@ -1498,8 +1498,7 @@ export function allianceRequestCountryForm(player, countryId) {
                     break;
                 };
                 case 1: {
-                    const playerData = GetAndParsePropertyData(`player_${player.id}`);
-                    AddAlliance(playerData.country, countryId);
+                    acceptAlliance(player, countryId);
                     break;
                 };
                 case 2: {

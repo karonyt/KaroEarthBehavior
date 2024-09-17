@@ -14,7 +14,6 @@ export function createOrganizationForm(player) {
             };
             return;
         };
-
     });
 };
 

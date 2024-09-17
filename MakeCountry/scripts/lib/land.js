@@ -167,81 +167,118 @@ export function DeleteCountry(countryId) {
     StringifyAndSavePropertyData(`player_${ownerData.id}`, ownerData);
     system.runTimeout(() => {
         countryData.members.forEach(m => {
-            const playerData = GetAndParsePropertyData(`player_${m}`);
-            playerData.roles = [];
-            playerData.country = undefined;
-            StringifyAndSavePropertyData(`player_${m}`, playerData);
+            try {
+                const playerData = GetAndParsePropertyData(`player_${m}`);
+                playerData.roles = [];
+                playerData.country = undefined;
+                StringifyAndSavePropertyData(`player_${m}`, playerData);
+            } catch (error) {
+            };
         });
     });
     system.runTimeout(() => {
         countryData.territories.forEach(t => {
-            const chunkData = GetAndParsePropertyData(t);
-            chunkData.countryId = undefined;
-            StringifyAndSavePropertyData(t, chunkData);
+            try {
+                const chunkData = GetAndParsePropertyData(t);
+                chunkData.countryId = undefined;
+                StringifyAndSavePropertyData(t, chunkData);
+            } catch (error) {
+
+            }
         });
     }, 2);
     system.runTimeout(() => {
         countryData.alliance.forEach(a => {
-            RemoveAlliance(countryId, a);
+            try {
+                RemoveAlliance(countryId, a);
+            } catch (error) {
+            }
         });
     }, 3);
     system.runTimeout(() => {
         countryData.hostility.forEach(h => {
-            RemoveHostility(countryId, h);
+            try {
+                RemoveHostility(countryId, h);
+            } catch (error) {
+            };
         });
     }, 4);
     system.runTimeout(() => {
         countryData.roles.forEach(r => {
-            DyProp.setDynamicProperty(`role_${r}`);
+            try {
+                DyProp.setDynamicProperty(`role_${r}`);
+            } catch (error) {
+            };
         });
     }, 5);
     system.runTimeout(() => {
         countryData.allianceRequestSend.forEach(a => {
-            const aCountry = GetAndParsePropertyData(`country_${a}`);
-            aCountry.allianceRequestReceive.splice(aCountry.allianceRequestReceive.indexOf(countryData.id), 1);
-            StringifyAndSavePropertyData(`country_${a}`, aCountry);
+            try {
+                const aCountry = GetAndParsePropertyData(`country_${a}`);
+                aCountry.allianceRequestReceive.splice(aCountry.allianceRequestReceive.indexOf(countryData.id), 1);
+                StringifyAndSavePropertyData(`country_${a}`, aCountry);
+            } catch (error) {
+            };
         });
     }, 6);
     system.runTimeout(() => {
         countryData.allianceRequestReceive.forEach(a => {
-            const aCountry = GetAndParsePropertyData(`country_${a}`);
-            aCountry.allianceRequestSend.splice(aCountry.allianceRequestSend.indexOf(countryData.id), 1);
-            StringifyAndSavePropertyData(`country_${a}`, aCountry);
+            try {
+                const aCountry = GetAndParsePropertyData(`country_${a}`);
+                aCountry.allianceRequestSend.splice(aCountry.allianceRequestSend.indexOf(countryData.id), 1);
+                StringifyAndSavePropertyData(`country_${a}`, aCountry);
+            } catch (error) {
+            };
         });
     }, 7);
     system.runTimeout(() => {
         countryData.applicationPeaceRequestSend.forEach(a => {
-            const aCountry = GetAndParsePropertyData(`country_${a}`);
-            aCountry.applicationPeaceRequestReceive.splice(aCountry.applicationPeaceRequestReceive.indexOf(countryData.id), 1);
-            StringifyAndSavePropertyData(`country_${a}`, aCountry);
+            try {
+                const aCountry = GetAndParsePropertyData(`country_${a}`);
+                aCountry.applicationPeaceRequestReceive.splice(aCountry.applicationPeaceRequestReceive.indexOf(countryData.id), 1);
+                StringifyAndSavePropertyData(`country_${a}`, aCountry);    
+            } catch (error) {
+            };
         });
     }, 8);
     system.runTimeout(() => {
         countryData.applicationPeaceRequestReceive.forEach(a => {
-            const aCountry = GetAndParsePropertyData(`country_${a}`);
-            aCountry.applicationPeaceRequestSend.splice(aCountry.applicationPeaceRequestSend.indexOf(countryData.id), 1);
-            StringifyAndSavePropertyData(`country_${a}`, aCountry);
+            try {
+                const aCountry = GetAndParsePropertyData(`country_${a}`);
+                aCountry.applicationPeaceRequestSend.splice(aCountry.applicationPeaceRequestSend.indexOf(countryData.id), 1);
+                StringifyAndSavePropertyData(`country_${a}`, aCountry);    
+            } catch (error) {
+            };
         });
     }, 9);
     system.runTimeout(() => {
         countryData.declarationSend.forEach(a => {
-            const aCountry = GetAndParsePropertyData(`country_${a}`);
-            aCountry.declarationReceive.splice(aCountry.declarationReceive.indexOf(countryData.id), 1);
-            StringifyAndSavePropertyData(`country_${a}`, aCountry);
+            try {
+                const aCountry = GetAndParsePropertyData(`country_${a}`);
+                aCountry.declarationReceive.splice(aCountry.declarationReceive.indexOf(countryData.id), 1);
+                StringifyAndSavePropertyData(`country_${a}`, aCountry);    
+            } catch (error) {
+            };
         });
     }, 10);
     system.runTimeout(() => {
         countryData.declarationReceive.forEach(a => {
-            const aCountry = GetAndParsePropertyData(`country_${a}`);
-            aCountry.declarationSend.splice(aCountry.declarationSend.indexOf(countryData.id), 1);
-            StringifyAndSavePropertyData(`country_${a}`, aCountry);
+            try {
+                const aCountry = GetAndParsePropertyData(`country_${a}`);
+                aCountry.declarationSend.splice(aCountry.declarationSend.indexOf(countryData.id), 1);
+                StringifyAndSavePropertyData(`country_${a}`, aCountry);    
+            } catch (error) {
+            };
         });
     }, 11);
     system.runTimeout(() => {
         countryData.warNowCountries.forEach(a => {
-            const aCountry = GetAndParsePropertyData(`country_${a}`);
-            aCountry.warNowCountries.splice(aCountry.warNowCountries.indexOf(countryData.id), 1);
-            StringifyAndSavePropertyData(`country_${a}`, aCountry);
+            try {
+                const aCountry = GetAndParsePropertyData(`country_${a}`);
+                aCountry.warNowCountries.splice(aCountry.warNowCountries.indexOf(countryData.id), 1);
+                StringifyAndSavePropertyData(`country_${a}`, aCountry);    
+            } catch (error) {
+            };
         });
     }, 12);
     system.runTimeout(() => {
@@ -357,24 +394,6 @@ export function RemoveHostility(mainCountryId, countryId) {
     try {
         mainCountryData.hostility.splice(mainCountryData.hostility.indexOf(countryId), 1);
         CountryData.hostility.splice(CountryData.hostility.indexOf(mainCountryId), 1);
-        StringifyAndSavePropertyData(`country_${mainCountryId}`, mainCountryData);
-        StringifyAndSavePropertyData(`country_${countryId}`, CountryData);
-    } catch (error) {
-        console.warn(error);
-    };
-};
-
-/**完成
- * 同盟追加
- * @param {string} mainCountryId 
- * @param {string} countryId 
- */
-export function AddAlliance(mainCountryId, countryId) {
-    const mainCountryData = GetAndParsePropertyData(`country_${mainCountryId}`);
-    const CountryData = GetAndParsePropertyData(`country_${countryId}`);
-    try {
-        mainCountryData.alliance.push(countryId);
-        CountryData.alliance.push(mainCountryId);
         StringifyAndSavePropertyData(`country_${mainCountryId}`, mainCountryData);
         StringifyAndSavePropertyData(`country_${countryId}`, CountryData);
     } catch (error) {
@@ -532,7 +551,6 @@ export function changeOwnerScriptEvent(member) {
     StringifyAndSavePropertyData(`country_${countryData.id}`, countryData);
     return;
 };
-
 
 /**
  * プレイヤーに招待を送る
