@@ -3,7 +3,7 @@ import * as DyProp from "./DyProp";
 import { ActionFormData, FormCancelationReason, ModalFormData } from "@minecraft/server-ui";
 import config from "../config";
 import { acceptAlliance, acceptApplicationRequest, AddHostilityByPlayer, CreateRoleToCountry, DeleteCountry, DeleteRole, denyAllianceRequest, denyApplicationRequest, MakeCountry, playerChangeOwner, playerCountryInvite, playerCountryJoin, playerCountryKick, RemoveAlliance, sendAllianceRequest, sendApplicationForPeace } from "./land";
-import { CheckPermission, CheckPermissionFromLocation, GetAndParsePropertyData, GetPlayerChunkPropertyId, isDecimalNumber, StringifyAndSavePropertyData } from "./util";
+import { CheckPermission, CheckPermissionFromLocation, GetAndParsePropertyData, GetPlayerChunkPropertyId, isDecimalNumber, isDecimalNumberZeroOK, StringifyAndSavePropertyData } from "./util";
 
 /**
  * 
@@ -2500,7 +2500,7 @@ export function editTaxMainForm(player) {
             return;
         };
         let value = rs.formValues[1];
-        if (!isDecimalNumber(value)) {
+        if (!isDecimalNumberZeroOK(value)) {
             player.sendMessage({ translate: `input.error.notnumber` });
             return;
         };
