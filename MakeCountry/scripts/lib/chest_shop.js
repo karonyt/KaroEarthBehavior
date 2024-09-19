@@ -1,5 +1,5 @@
 import { EntityComponentTypes, system, world, BlockComponentTypes, SignSide, Direction } from '@minecraft/server';
-import { chestShopConfig } from 'chest_shop_config.js';
+import { chestShopConfig } from '../chest_shop_config.js';
 import { GetAndParsePropertyData, StringifyAndSavePropertyData } from './util.js';
 
 /**

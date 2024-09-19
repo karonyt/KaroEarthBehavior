@@ -21,3 +21,7 @@ import "./anticheat";
 import "./custom_component";
 
 import "./lib/war";
+
+import "./lib/chest_shop";
+
+import "./lib/piston";
