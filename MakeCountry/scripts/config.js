@@ -110,5 +110,8 @@ export default {
         startTime: { hour: 18, min: 0 },
         //期間終了時刻(24時間制)
         endTime: { hour: 23, min: 0 }
-    }
+    },
+
+    //荒野でピストンを置けないようにするか
+    isNoPiston: true,
 };

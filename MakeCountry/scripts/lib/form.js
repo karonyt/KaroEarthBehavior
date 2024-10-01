@@ -2623,6 +2623,7 @@ const rolePermissions = [
     `invite`,
     `place`,
     `break`,
+    `pistonPlace`
     `setHome`,
     `kick`,
     `openContainer`,

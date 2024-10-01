@@ -1,4 +1,4 @@
-import { Player } from "@minecraft/server";
+import { Block, Entity, Player } from "@minecraft/server";
 import * as Dyprop from "./DyProp";
 import config from "../config";
 
@@ -17,7 +17,7 @@ export function GetChunkPropertyId(rawX, rawZ, dimension = `overworld`) {
 
 /**
  * プレイヤーがいるチャンクのダイプロのidを取得
- * @param {Player} player
+ * @param {Player|Entity|Block} player
  * @returns {string}
  */
 export function GetPlayerChunkPropertyId(player) {

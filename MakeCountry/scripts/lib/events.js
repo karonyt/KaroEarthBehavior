@@ -61,8 +61,37 @@ world.beforeEvents.playerPlaceBlock.subscribe((ev) => {
     return;
 });
 
+world.beforeEvents.playerPlaceBlock.subscribe((ev) => {
+    const permission = `pistonPlace`
+    const { player, block, permutationBeingPlaced } = ev;
+    if (!permutationBeingPlaced?.type.id.includes(`piston`)) return;
+    const { x, z } = block.location;
+    const cannot = CheckPermissionFromLocation(player, x, z, player.dimension.id, permission);
+    ev.cancel = cannot;
+    if (!cannot) return;
+    player.sendMessage({ translate: `cannot.permission.${permission}` });
+    return;
+});
+
+world.beforeEvents.playerPlaceBlock.subscribe((ev) => {
+    const { player, block, permutationBeingPlaced } = ev;
+    if (!permutationBeingPlaced?.type.id.includes(`hopper`)) return;
+    const { x, z } = block.location;
+    const chest = block.above()
+    if (!chest) return;
+    if (!chest.typeId.includes('chest')) return;
+    const chestId = `chest_${chest.location.x}_${chest.location.y}_${chest.location.z}_${dimensionId}`;
+    const chestLockData = GetAndParsePropertyData(chestId);
+    if (chestLockData) {
+        ev.cancel = true;
+        //保護されているチェストの下にホッパーを置くことはできません
+        player.sendMessage({ translate: `cannot.place.hopper.below.lockchest` });
+    };
+    return;
+});
+
 world.beforeEvents.itemUseOn.subscribe((ev) => {
-    if(!ev.isFirstEvent) return;
+    if (!ev.isFirstEvent) return;
     const permission = `place`
     const { source: player, block } = ev;
     const { x, z } = block.location;
@@ -74,7 +103,7 @@ world.beforeEvents.itemUseOn.subscribe((ev) => {
 });
 
 world.beforeEvents.playerInteractWithBlock.subscribe((ev) => {
-    if(!ev.isFirstEvent) return;
+    if (!ev.isFirstEvent) return;
     const permission2 = 'openContainer'; // コンテナの開放権限
     const permission = 'blockUse'; // ブロックの使用権限
     const { player, block } = ev;
