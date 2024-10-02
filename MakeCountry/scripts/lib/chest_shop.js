@@ -394,7 +394,7 @@ world.beforeEvents.playerInteractWithBlock.subscribe(async (ev) => {
     // if(shopData.player === ev.player.name) return
 
     shopMoney += shopData.buyPrice;
-    setPlayerMoney(shopData.player, shopMoney);
+    setPlayerMoney(playerNameToId(shopData.player), shopMoney);
 
     money = getPlayerMoney(ev.player.id);
 
@@ -418,9 +418,9 @@ world.afterEvents.entityHitBlock.subscribe(async (ev) => {
 
     await system.waitTicks(1);
 
-    let money = getPlayerMoney(ev.damagingEntity.nameTag);
+    let money = getPlayerMoney(ev.damagingEntity.id);
     if (money === undefined) return;
-    let shopMoney = getPlayerMoney(shopData.player);
+    let shopMoney = getPlayerMoney(playerNameToId(shopData.player));
     if (shopMoney === undefined) return;
 
     if (shopData.sellPrice > shopMoney) return;
@@ -444,20 +444,32 @@ world.afterEvents.entityHitBlock.subscribe(async (ev) => {
     // if(shopData.player === ev.player.name) return
 
     shopMoney -= shopData.sellPrice;
-    setPlayerMoney(shopData.player, shopMoney);
+    setPlayerMoney(playerNameToId(shopData.player), shopMoney);
 
-    money = getPlayerMoney(ev.damagingEntity.nameTag);
+    money = getPlayerMoney(ev.damagingEntity.id);
     money += shopData.sellPrice;
-    setPlayerMoney(ev.damagingEntity.nameTag, money);
+    setPlayerMoney(ev.damagingEntity.id, money);
 });
 
 world.beforeEvents.playerBreakBlock.subscribe((ev) => {
-    const { player , block } = ev;
+    const { player, block } = ev;
     const signTexts = getSignTexts(block);
     if (signTexts === undefined) return;
     const shopData = getShopData(signTexts, block);
     if (shopData === undefined) return;
-    if(player.hasTag(`adminmode`)) return;
-    if(shopData.player == player.name) return;
+    if (player.hasTag(`adminmode`)) return;
+    if (shopData.player == player.name) return;
+    ev.cancel = true;
+});
+
+world.beforeEvents.playerBreakBlock.subscribe((ev) => {
+    const { player, block } = ev;
+    if(!block.typeId.includes(`chest`)) return;
+    const signTexts = getSignTexts(block);
+    if (signTexts === undefined) return;
+    const shopData = getShopData(signTexts, block);
+    if (shopData === undefined) return;
+    if (player.hasTag(`adminmode`)) return;
+    if (shopData.player == player.name) return;
     ev.cancel = true;
 });
