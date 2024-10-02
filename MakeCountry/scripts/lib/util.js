@@ -390,3 +390,17 @@ export function getTimeBefore(time, minutesBefore) {
     // 新しい時間を返す
     return { hour: newHour, min: newMin };
 };
+
+/**
+ * プレイヤー名からIDを取得
+ * @param {string} playerName 
+ * @returns {string}
+ */
+export function playerNameToId(playerName) {
+    const playerIds = Dyprop.DynamicPropertyIds().filter(id => id.startsWith(`player_`));
+    for(const id of playerIds) {
+        let pData = GetAndParsePropertyData(id);
+        if(pData.name == playerName) return pData.id;
+    };
+    return undefined;
+};

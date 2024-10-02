@@ -1,6 +1,6 @@
 import { EntityComponentTypes, system, world, BlockComponentTypes, SignSide, Direction } from '@minecraft/server';
 import { chestShopConfig } from '../chest_shop_config.js';
-import { GetAndParsePropertyData, StringifyAndSavePropertyData } from './util.js';
+import { GetAndParsePropertyData, playerNameToId, StringifyAndSavePropertyData } from './util.js';
 
 /**
  *
@@ -368,9 +368,9 @@ world.beforeEvents.playerInteractWithBlock.subscribe(async (ev) => {
 
     if (shopData.buyPrice <= 0) return;
 
-    let money = getPlayerMoney(ev.player.name);
+    let money = getPlayerMoney(ev.player.id);
     if (money === undefined) return;
-    let shopMoney = getPlayerMoney(shopData.player);
+    let shopMoney = getPlayerMoney(playerNameToId(shopData.player));
     if (shopMoney === undefined) return;
 
     if (shopData.buyPrice > money) return;
@@ -396,10 +396,10 @@ world.beforeEvents.playerInteractWithBlock.subscribe(async (ev) => {
     shopMoney += shopData.buyPrice;
     setPlayerMoney(shopData.player, shopMoney);
 
-    money = getPlayerMoney(ev.player.name);
+    money = getPlayerMoney(ev.player.id);
 
     money -= shopData.buyPrice;
-    setPlayerMoney(ev.player.name, money);
+    setPlayerMoney(ev.player.id, money);
 });
 
 world.afterEvents.entityHitBlock.subscribe(async (ev) => {
@@ -449,4 +449,15 @@ world.afterEvents.entityHitBlock.subscribe(async (ev) => {
     money = getPlayerMoney(ev.damagingEntity.nameTag);
     money += shopData.sellPrice;
     setPlayerMoney(ev.damagingEntity.nameTag, money);
+});
+
+world.beforeEvents.playerBreakBlock.subscribe((ev) => {
+    const { player , block } = ev;
+    const signTexts = getSignTexts(block);
+    if (signTexts === undefined) return;
+    const shopData = getShopData(signTexts, block);
+    if (shopData === undefined) return;
+    if(player.hasTag(`adminmode`)) return;
+    if(shopData.player == player.name) return;
+    ev.cancel = true;
 });
